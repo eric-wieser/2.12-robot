@@ -1,0 +1,76 @@
+*****************************************************************
+      SolidWorks Corporation - IGES Processor Status Report
+*****************************************************************
+=================================================================
+General Information
+=================================================================
+Sending System Product I.D.  : Noname
+Receiving System Product I.D.: Noname
+File Name                    : S1A.igs
+Sending System               : By Siemens PLM Incorporated
+Preprocessor Version         : XPlus GENERIC/IGES 17.0.49
+File Creation Date           : 20150805.060341
+Model Creation Date          : 20150805.060341
+Units                        : MM
+Model Space Scale            : 1
+Author                       : Noname
+Organization                 : Noname
+
+
+=================================================================
+Entity Processing Information
+=================================================================
+WARNING: DE#  2109, TYPE   144: Error repaired by using 3D trim curves.
+WARNING: DE#  2151, TYPE   144: Error repaired by using 3D trim curves.
+WARNING: DE#  2739, TYPE   144: Error repaired by using 3D trim curves.
+WARNING: DE#  2991, TYPE   144: Error repaired by using 3D trim curves.
+WARNING: DE#  3033, TYPE   144: Error repaired by using 3D trim curves.
+WARNING: DE#  4087, TYPE   144: Error repaired by using 3D trim curves.
+WARNING: DE# 13071, TYPE   144: Error repaired by using 3D trim curves.
+WARNING: DE# 17785, TYPE   144: Error repaired by using 3D trim curves.
+WARNING: DE# 17945, TYPE   144: Error repaired by using 3D trim curves.
+
+
+=================================================================
+Precision analysis of IGES file:
+=================================================================
+  Most prevalent number of significant digits:               3
+  Highest number of significant digits:                     14
+  Average number of significant digits:                7.26222
+  Maximum distance to origin:                           1007.5
+  Minimum distance to origin:                                0
+  Effective number of significant digits:                   14
+
+
+=================================================================
+Entity Summary
+=================================================================
+-----------------------------------------------------------------
+Type Name                                         Count Converted
+---- ----                                         ----- ---------
+100  Arc                                            769       769
+102  Composite curve                               1024      1024
+110  Line                                          2530      2530
+120  Surface of revolution                          209       209
+122  Tabulated cylinder                             275       275
+124  Transformation matrix                          776       776
+126  Rational B-spline curve                       2929      2929
+142  Curve on a parametric surface                  512       512
+144  Trimmed parametric surface                     484       484
+308  Subfigure definition                             9         9
+408  Singular subfigure instance                     10        10
+_________________________________________________________________
+
+
+=================================================================
+Result Summary
+=================================================================
+SolidWorks Feature Type                Count
+-----------------------                -----
+Solid feature(s)                       6
+Surface feature(s)                     6
+Curve/Sketch feature(s)                0
+--------------------------------------------
+Start time: Wednesday, August 05, 2015 00:04:15
+Finish time: Wednesday, August 05, 2015 00:04:23
+Processing time: 0 days, 00 hours, 00 mins, 08 secs
