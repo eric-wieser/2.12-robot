@@ -2,9 +2,6 @@
 
 #include "RobotPosition.h"
 
-unsigned long currentSerialTime = 0;
-unsigned long prevSerialTime = 0;
-
 //SerialCommunication Class function implementation
 void SerialCommunication::initialize() {
   prevSerialTime = micros();
