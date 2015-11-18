@@ -8,12 +8,16 @@ Sept. 2015
 */
 
 
-//Include the SPI bus library, the encoder buffer library, and the motor shield library
 #include "Arduino.h"
-#include "SPI.h"
-#include "LS7366.h"
-#include "DualMC33926MotorShield.h"
-#include "ArduinoLab3Helper.h"
+
+// include our classes
+#include "EncoderMeasurement.h"
+#include "RobotPosition.h"
+#include "PIController.h"
+#include "SerialCommunication.h"
+#include "PathPlanner.h"
+
+#include "constants.h"
 
 EncoderMeasurement measureRobot; //instantiate encoder handler class
 RobotPosition robotPos; //instantiate robot position and orientation calculation class
@@ -21,13 +25,12 @@ PIController moveRobot; //instantiate velocity PI controller class
 SerialCommunication reportData; //instantiate matlab plot serial communication class
 PathPlanner pathPlanner; //instantiate path planner
 
-
-
+unsigned long currentTime;
+unsigned long prevTime;
 
 void setup() {
   Serial.begin(115200);      // Initialize Serial Communication
-  initEncoders();       Serial.println("Encoders Initialized..."); //initialize Encoders
-  clearEncoderCount();  Serial.println("Encoders Cleared..."); //clear Encoder Counts
+ 
   currentTime = micros(); //initialize timer
   prevTime = micros(); //initialize timer
   measureRobot.initialize(); //initialize robot encoder handler
@@ -50,26 +53,25 @@ void loop() {
     reportData.sendSerialData(robotPos); //report data to matlab via serial communication
     reportData.receiveSerialData();
     //pathPlanner.LabTestRun(robotPos); //plan the next path
-    
-   pathPlanner.turnToGo(robotPos, reportData); //turn then go straight towards next point
-    
+
+    pathPlanner.turnToGo(robotPos, reportData); //turn then go straight towards next point
+
     /*
     if (!reportData.finished){
     pathPlanner.desiredMVL = .2;
     pathPlanner.desiredMVR = .2;
     }
-    
+
     pathPlanner.OrientationController(robotPos, reportData);
     if (reportData.finished){
       pathPlanner.desiredMVL = 0.0;
     pathPlanner.desiredMVR = 0.0;
     }
     */
-    
+
     moveRobot.doPIControl("Left", pathPlanner.desiredMVL, measureRobot.mVL); //left motor PI control
     moveRobot.doPIControl("Right", pathPlanner.desiredMVR, measureRobot.mVR); // right motor PI control
     prevTime = currentTime; //update timer
-    
   }
 }
 
