@@ -9,7 +9,7 @@ Sept. 2015
 #define ArduinoLab2Helper_h
 
 #include "Arduino.h"
-#include "LS7366.h"
+#include "encoders.h"
 #include "DualMC33926MotorShield.h"
 
 
