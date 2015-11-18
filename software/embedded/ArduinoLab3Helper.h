@@ -14,7 +14,6 @@ Sept. 2015
 
 
 //Some useful constant definitions
-#define PI 3.14159265
 #define FREQ 2000
 #define PERIOD 0.0005
 #define PERIOD_MICROS 500
