@@ -15,9 +15,9 @@ void PIController::initialize() {
   integralCommand2 = 0;
 }
 
-void PIController::doPIControl(String side, float desV, float currV) {
+void PIController::doPIControl(Side side, float desV, float currV) {
   desV = constrain(desV,-0.41, 0.41);
-  if (side == "Right") {
+  if (side == SIDE_RIGHT) {
     //Motor 1 velocity control
     integratedVError1 = integratedVError1 + (desV - currV) * PERIOD;
     integralCommand1 = constrain(Kiv1 * integratedVError1, -200, 200);
@@ -29,7 +29,7 @@ void PIController::doPIControl(String side, float desV, float currV) {
     md.setM1Speed(constrain(m1Command, -400, 400));
     PrevCommand1 = m1Command;
   }
-  else if (side == "Left") {
+  else if (side == SIDE_LEFT) {
     //Motor 2 velocity control
     integratedVError2 = integratedVError2 + (desV - currV) * PERIOD;
     integralCommand2 = constrain(Kiv2 * integratedVError2, -200, 200);

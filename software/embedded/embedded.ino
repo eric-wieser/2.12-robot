@@ -69,11 +69,12 @@ void loop() {
     }
     */
 
-    moveRobot.doPIControl("Left", pathPlanner.desiredMVL, measureRobot.mVL); //left motor PI control
-    moveRobot.doPIControl("Right", pathPlanner.desiredMVR, measureRobot.mVR); // right motor PI control
+    moveRobot.doPIControl(SIDE_LEFT, pathPlanner.desiredMVL, measureRobot.mVL); //left motor PI control
+    moveRobot.doPIControl(SIDE_RIGHT, pathPlanner.desiredMVR, measureRobot.mVR); // right motor PI control
     prevTime = currentTime; //update timer
   }
 }
+
 
 
 

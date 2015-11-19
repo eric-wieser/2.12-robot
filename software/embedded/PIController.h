@@ -2,6 +2,11 @@
 
 #include "DualMC33926MotorShield.h"
 
+enum Side {
+    SIDE_LEFT = 2,
+    SIDE_RIGHT = 1
+};
+
 /*
 Class Name: PIController
 Description: robot motor velocity controller
@@ -39,7 +44,7 @@ class PIController {
     Output: None
     Usage: Call this function to change the velocity of the robot
     */
-    void doPIControl(String side, float desV, float currV);
+    void doPIControl(Side side, float desV, float currV);
 
   private:
     float integratedVError1; //integrator error for motor 1
