@@ -20,7 +20,7 @@ void clearEncoderCount() {
 }
 
 
-long readEncoder(int encoder) {
+uint32_t readEncoder(int encoder) {
   if (encoder == 1) {
     return left.read();
   }

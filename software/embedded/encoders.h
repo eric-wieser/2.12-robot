@@ -10,6 +10,6 @@ namespace encoders {
 
 void initEncoders();
 void clearEncoderCount();
-long readEncoder(int encoder);
+uint32_t readEncoder(int encoder);
 
 #endif

@@ -63,15 +63,15 @@ void LS7366::configure() {
   digitalWrite(cs_pin,HIGH);       // Terminate SPI conversation
 }
 
-long LS7366::read() {
-  int32_t result = 0;
+uint32_t LS7366::read() {
+  uint32_t result = 0;
 
   digitalWrite(cs_pin, LOW);      // Begin SPI conversation
   SPI.transfer(RD | CNTR);        // Request count
-  result |= static_cast<long>(SPI.transfer(0x00)) << 24;   // Read highest order byte
-  result |= static_cast<long>(SPI.transfer(0x00)) << 16;
-  result |= static_cast<long>(SPI.transfer(0x00)) << 8;
-  result |= static_cast<long>(SPI.transfer(0x00));         // Read lowest order byte
+  result |= static_cast<uint32_t>(SPI.transfer(0x00)) << 24;   // Read highest order byte
+  result |= static_cast<uint32_t>(SPI.transfer(0x00)) << 16;
+  result |= static_cast<uint32_t>(SPI.transfer(0x00)) << 8;
+  result |= static_cast<uint32_t>(SPI.transfer(0x00));         // Read lowest order byte
   digitalWrite(cs_pin, HIGH);     // Terminate SPI conversation
 
   return result;
