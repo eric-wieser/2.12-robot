@@ -99,10 +99,10 @@ class PathPlanner {
               
     Requirement: None
     Input: None
-    Output: None
+    Output: whether the goal has been reached
     Usage; Call this function in each timed loop to update the desired wheel velocity
     */
-    void OrientationController(const RobotPosition & robotPos, SerialCommunication & reportData);
+    bool OrientationController(const RobotPosition & robotPos, const SerialCommunication & reportData, float kp);
  
  
  
