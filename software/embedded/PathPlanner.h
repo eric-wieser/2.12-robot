@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Angle.h"
+
 class RobotPosition;
 class SerialCommunication;
 
@@ -22,13 +24,13 @@ class PathPlanner {
     float forwardVel;
     float desiredMVL;
     float desiredMVR;
-    float phiGoal;
+    Angle phiGoal;
     float pathGoal;
     float xlast;
     float ylast;
-    float philast;
+    Angle philast;
     float pathlast;
-    float phiDesired;
+    Angle phiDesired;
     float pathDesired;
     /*Function Name: initialize();
     Effect: Initialize all public member variables of the class to 0

@@ -13,7 +13,7 @@ void RobotPosition::initialize() {
 
 void RobotPosition::update(float dThetaL, float dThetaR) {
   float dPhi = (r / (2.0 * b)) * (dThetaR - dThetaL);
-  float AvgPhi = Phi + dPhi / 2.0;
+  Angle AvgPhi = Phi + dPhi / 2;
   float dX = (r / 2.0) * cos(AvgPhi) * (dThetaR + dThetaL);
   float dY = (r / 2.0) * sin(AvgPhi) * (dThetaR + dThetaL);
 

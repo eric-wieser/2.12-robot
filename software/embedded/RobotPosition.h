@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Angle.h"
+
 /*
 Class Name: RobotPosition
 Description: vehicle position and orientation calculator
@@ -17,7 +19,7 @@ class RobotPosition {
   public:
     float X;  //robot X position in meters
     float Y;  //robot Y position in meters
-    float Phi; //robot global orientation in meters
+    Angle Phi; //robot global orientation in meters
     float pathDistance; //trajectory path distance in meters
     /*
     Function Name: initialize()

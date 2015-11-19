@@ -13,7 +13,7 @@ void SerialCommunication::sendSerialData(const RobotPosition & robotPos) {
     Serial.print(",");
     Serial.print(robotPos.Y, 6); //Y
     Serial.print(",");
-    Serial.print(robotPos.Phi); //Phi
+    Serial.print(float(robotPos.Phi)); //Phi
     Serial.print(",");
     Serial.println(finished ? 1 : 0);
     prevSerialTime = micros();
