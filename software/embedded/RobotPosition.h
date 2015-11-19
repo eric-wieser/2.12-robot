@@ -19,7 +19,6 @@ class RobotPosition {
     float Y;  //robot Y position in meters
     float Phi; //robot global orientation in meters
     float pathDistance; //trajectory path distance in meters
-    float AvgPhi; //average orientation angle phi between to timed loop iterations in radians
     /*
     Function Name: initialize()
     Effect: Initialize all public member variables of the class to 0
@@ -42,12 +41,4 @@ class RobotPosition {
     Usage; Call this function upon instantiation of the class to a global object
     */
     void update(float dThetaL, float dThetaR); //update the value
-
-  private:
-    float dPhi; //orientation angle phi increment in radians
-    float prevPhi; //previous orientation angle phi value in radians
-    float dX;  //robot X position increment in meters
-    float dY; //robot Y position increment in meters
-    float prevX; //previous robot X position
-    float prevY; //previous robot Y position
 };
