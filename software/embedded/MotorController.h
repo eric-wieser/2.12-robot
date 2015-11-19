@@ -2,10 +2,7 @@
 
 #include "DualMC33926MotorShield.h"
 
-enum Side {
-    SIDE_LEFT = 2,
-    SIDE_RIGHT = 1
-};
+#include "PIDController.h"
 
 /*
 Class Name: PIController
@@ -18,7 +15,7 @@ External Function Dependency:
 External Variable Dependency:
     1. void doPIControl(String side, float desV, float currV); with side from input string. desV from PathPlanner object and currV from RobotPosition object
 */
-class PIController {
+class MotorController {
   public:
     DualMC33926MotorShield md;
     int m1Command; //reference command to motor 1 range from -400 to 400
@@ -33,30 +30,19 @@ class PIController {
     */
     void initialize();
     /*
-    Function Name: void doPIControl(String side, float refV, float currV);
     Effect: Actuate the motor with PI Controller.
     Modifies: All member variables
     Requirement: None
     Input:
-        1. String side; use "Left" or "Right" strings for implementation
         2. float desV; desired velocity in m/s
         3. float currV; current velocity in m/s
     Output: None
     Usage: Call this function to change the velocity of the robot
     */
-    void doPIControl(Side side, float desV, float currV);
+    void controlM1(float desV, float currV);
+    void controlM2(float desV, float currV);
 
   private:
-    float integratedVError1; //integrator error for motor 1
-    float integratedVError2; //integrator error for motor 2
-    float integralCommand1; //integrated command for motor 1
-    float integralCommand2; // integrated command for motor 2
-    const int Kpv1 = 18; //proportional gain for motor 1
-    const int Kpv2 = 18; //proportional gain for motor 2
-    const int Kdv1 = 0; //derivative gain for motor 1
-    const int Kdv2 = 0; //derivative gain for motor 2
-    const float Kiv1 = 2.0; //integrator gain for motor 1
-    const float Kiv2 = 2.0; //integrator gain for motor 2
-    int PrevCommand1; //previous command for motor 1
-    int PrevCommand2; //previous command for motor 2
+    PIDController m1Controller = PIDController(18, 2, 0);
+    PIDController m2Controller = PIDController(18, 2, 0);
 };

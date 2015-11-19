@@ -13,7 +13,7 @@ Sept. 2015
 // include our classes
 #include "EncoderMeasurement.h"
 #include "RobotPosition.h"
-#include "PIController.h"
+#include "MotorController.h"
 #include "SerialCommunication.h"
 #include "PathPlanner.h"
 
@@ -21,7 +21,7 @@ Sept. 2015
 
 EncoderMeasurement measureRobot; //instantiate encoder handler class
 RobotPosition robotPos; //instantiate robot position and orientation calculation class
-PIController moveRobot; //instantiate velocity PI controller class
+MotorController moveRobot; //instantiate velocity PI controller class
 SerialCommunication reportData; //instantiate matlab plot serial communication class
 PathPlanner pathPlanner; //instantiate path planner
 
@@ -69,8 +69,8 @@ void loop() {
     }
     */
 
-    moveRobot.doPIControl(SIDE_LEFT, pathPlanner.desiredMVL, measureRobot.mVL); //left motor PI control
-    moveRobot.doPIControl(SIDE_RIGHT, pathPlanner.desiredMVR, measureRobot.mVR); // right motor PI control
+    moveRobot.controlM2(pathPlanner.desiredMVL, measureRobot.mVL); //left motor PI control
+    moveRobot.controlM1(pathPlanner.desiredMVR, measureRobot.mVR); // right motor PI control
     prevTime = currentTime; //update timer
   }
 }
