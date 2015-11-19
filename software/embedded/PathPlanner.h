@@ -20,8 +20,6 @@ External Variable Dependency:
 class PathPlanner {
   public:
     int currentTask;
-    float K;
-    float forwardVel;
     float desiredMVL;
     float desiredMVR;
     Angle phiGoal;
@@ -61,7 +59,7 @@ class PathPlanner {
     Output: None
     Usage; Call this function within the class to compute desiredMVL and desiredMVR
     */
-    void computeDesiredV();
+    void computeDesiredV(float forwardVel, float K);
     /*Function Name: void turnToGo1(const RobotPosition & robotPos);
     Effect: modify the member variable desiredMVL and desiredMVR based on the next goal position (X,Y) 
     Modifies: 1. int currentTask;

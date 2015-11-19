@@ -7,8 +7,6 @@
 //PathPlanner Class function implementation
 void PathPlanner::initialize() {
   currentTask = 1;
-  K = 0;
-  forwardVel = 0;
   desiredMVL = 0;
   desiredMVR = 0;
   phiGoal = 0;
@@ -23,9 +21,7 @@ void PathPlanner::initialize() {
 void PathPlanner::LabTestRun(const RobotPosition & robotPos) {
   if (currentTask == 1) { //we are moving forward
     if (robotPos.pathDistance < 1.0) { //if we aren't there yet, keep going
-      forwardVel = .2;
-      K = 0;
-      computeDesiredV();
+      computeDesiredV(.2, 0);
 
     } else { //if we are there, stop, reset distances, and move on to the next task
       desiredMVR = 0;
@@ -35,9 +31,7 @@ void PathPlanner::LabTestRun(const RobotPosition & robotPos) {
   }
   if (currentTask == 2) { //we are turning around
     if (robotPos.pathDistance < 1.0 + (PI * .25)) { //if we aren't there yet, keep going
-      forwardVel = .1;
-      K = 4;
-      computeDesiredV();
+      computeDesiredV(.1, 4);
     } else { //if we are there, stop and move on to the next task
       desiredMVR = 0;
       desiredMVL = 0;
@@ -46,9 +40,7 @@ void PathPlanner::LabTestRun(const RobotPosition & robotPos) {
   }
   if (currentTask == 3) { //we are going back home
     if (robotPos.pathDistance < 2.0 + (PI * .25) ) { //if we aren't there yet, keep going
-      forwardVel = .2;
-      K = 0;
-      computeDesiredV();
+      computeDesiredV(.2, 0);
     } else { //if we are there, stop and move on to the next task
       desiredMVR = 0;
       desiredMVL = 0;
@@ -58,7 +50,7 @@ void PathPlanner::LabTestRun(const RobotPosition & robotPos) {
   }
 }
 
-void PathPlanner::computeDesiredV() {
+void PathPlanner::computeDesiredV(float forwardVel, float K) {
   //command velocities based off of K and average forwardVel
   desiredMVR = forwardVel * (1 + K * b);
   desiredMVL = forwardVel * (1 - K * b);
@@ -72,7 +64,6 @@ bool PathPlanner::OrientationController(const RobotPosition & robotPos,
   float dx = reportData.commandX - robotPos.X;
   float dy = reportData.commandY - robotPos.Y;
   bool closeEnough = dx*dx + dy*dy > distEps*distEps;
-
   if(closeEnough) {
     return true;
   }
