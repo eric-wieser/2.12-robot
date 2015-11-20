@@ -1,5 +1,7 @@
 #pragma once
 
+#include <math.h>
+
 /**
 A class representing an angle, and dealing with wraparound in [-PI, PI)
 
@@ -28,7 +30,7 @@ public:
 	inline Angle& operator -=(float da) { _value -= da; return *this; }
 
 	// places where conversion to float isn't necessary
-	friend inline float cos(Angle a) { return cos(a._value); }
-	friend inline float sin(Angle a) { return sin(a._value); }
-	friend inline float tan(Angle a) { return tan(a._value); }
+	friend inline float cos(Angle a) { return cosf(a._value); }
+	friend inline float sin(Angle a) { return sinf(a._value); }
+	friend inline float tan(Angle a) { return tanf(a._value); }
 };
