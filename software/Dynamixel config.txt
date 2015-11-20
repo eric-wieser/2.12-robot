@@ -1,0 +1,11 @@
+http://forums.trossenrobotics.com/showthread.php?7139-Dynamixel-MX-Series-multi-turn
+
+Registers to configure for rail:
+* Resolution Divider
+* CW Angle Limit = 4095
+* CCW Angle Limit = 4095
+* Multi Turn Offset = 0
+
+commands to try:
+* Sync_write
+* Reg_write
