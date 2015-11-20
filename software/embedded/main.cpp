@@ -18,7 +18,6 @@ Main::Main() {
   currentTime = micros(); //initialize timer
   prevTime = micros(); //initialize timer
   measureRobot.initialize(); //initialize robot encoder handler
-  robotPos.initialize();//initialize robot position and orientation calculation
   moveRobot.initialize(); Serial.println("Motor Driver Initialized...");//intialize velocity PI controller
   reportData.initialize(); //initialize matlab plot serial communication
   pathPlanner.initialize(); //initialize path planner

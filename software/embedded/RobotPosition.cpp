@@ -4,7 +4,7 @@
 #include "constants.h"
 
 //RobotPosition Class function implementation
-void RobotPosition::initialize() {
+RobotPosition::RobotPosition() {
   Phi = 0;
   X = 0;
   Y = 0;

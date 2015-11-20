@@ -30,7 +30,7 @@ class RobotPosition {
     Output: None
     Usage; Call this function upon instantiation of the class to a global object
     */
-    void initialize();
+    RobotPosition();
     /*
     Function Name: update(float dThetaL, float dThetaR);
     Effect: Update the X,Y position and vehicle orientation angle Phi
