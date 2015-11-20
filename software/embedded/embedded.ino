@@ -11,7 +11,7 @@ Sept. 2015
 #include "hacks.h"
 
 // char buffer[sizeof(Main)];
-char buffer[sizeof(Robot)];
+char buffer[sizeof(Main)];
 Main * m;
 
 void setup() {
