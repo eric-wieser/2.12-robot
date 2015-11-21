@@ -38,3 +38,20 @@ void tests::motor_wiring() {
 		Serial.println(diffr);
 	}
 }
+
+
+void tests::encoder_wiring() {
+	Drive md;
+
+	md.resetEncoders();
+
+	while(true) {
+		uint32_t encr = md.getMREncoder();
+		uint32_t encl = md.getMLEncoder();
+		Serial.print(encr);
+		Serial.print(", ");
+		Serial.print(encl);
+		Serial.println();
+		delay(10);
+	}
+}
