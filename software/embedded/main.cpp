@@ -13,12 +13,10 @@ Sept. 2015
 #include "Arduino.h"
 #include "constants.h"
 
-Main::Main() {
+Main::Main() : measureRobot(drive), moveRobot(drive) {
 
   currentTime = micros(); //initialize timer
   prevTime = micros(); //initialize timer
-  measureRobot.initialize(); //initialize robot encoder handler
-  moveRobot.initialize(); Serial.println("Motor Driver Initialized...");//intialize velocity PI controller
   reportData.initialize(); //initialize matlab plot serial communication
   pathPlanner.initialize(); //initialize path planner
   delay(1e3);// set a delay so the robot doesn't drive off without you
@@ -51,8 +49,8 @@ void Main::loop() {
     }
     */
 
-    moveRobot.controlM2(pathPlanner.desiredMVL, measureRobot.mVL); //left motor PI control
-    moveRobot.controlM1(pathPlanner.desiredMVR, measureRobot.mVR); // right motor PI control
+    moveRobot.controlMR(pathPlanner.desiredMVR, measureRobot.mVR); // right motor PI control
+    moveRobot.controlML(pathPlanner.desiredMVL, measureRobot.mVL); //left motor PI control
     prevTime = currentTime; //update timer
   }
 }

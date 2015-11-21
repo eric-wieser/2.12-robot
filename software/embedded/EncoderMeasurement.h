@@ -3,6 +3,8 @@
 #include <math.h>
 #include <stdint.h>
 
+class Drive;
+
 /*
 Class Name: EncoderMeasurement
 Description:self contained class for handling encoder measurement
@@ -17,6 +19,8 @@ External Variable Dependency:  None
 */
 class EncoderMeasurement {
   public:
+    EncoderMeasurement(Drive &drive);
+
     float dThetaL;   //left wheel turned in radians
     float dThetaR;   //right wheel turned in radians
     float dWheelR;  //increment wheel 1 distance
@@ -25,16 +29,6 @@ class EncoderMeasurement {
     float totalWheelL;  //total wheel 2 distance
     float mVR; // right wheel velocity in m/s
     float mVL; // left wheel velocity in m/s
-    /*
-    Function Name: initialize()
-    Effect: Initialize all public member variables of the class to 0
-    Modifies: All member variables
-    Requirement: None
-    Input: None
-    Output: None
-    Usage; Call this function upon instantiation of the class to a global object
-    */
-    void initialize();
     /*
     Function Name: update(float dThetaL, float dThetaR);
     Effect: Update the encoder count and incremental angle of the cycle.
@@ -47,6 +41,8 @@ class EncoderMeasurement {
     void update();
 
   private:
+    Drive &drive;
+
     uint32_t encoderRCount;    //encoder 1 counts in ticks for the current cycle
     uint32_t encoderLCount;   //encoder 2 counts in ticks for the current cycle
     int dEncoderR;    //encoder increment 1

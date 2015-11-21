@@ -2,21 +2,23 @@
 
 #include "constants.h"
 
-//PIController Class function implementation
-void MotorController::initialize() {
-  md.init();
-  m1Command = 0;
-  m2Command = 0;
-  m1Controller.integralLimit = m2Controller.integralLimit = 200;
+#include "Drive.h"
+
+const float maxSpeed = 0.44;
+
+MotorController::MotorController(Drive& d) : drive(d) {
+  mRCommand = 0;
+  mLCommand = 0;
+  mRController.integralLimit = mLController.integralLimit = 200;
 }
 
-void MotorController::controlM1(float desV, float currV) {
-  desV = constrain(desV,-0.41, 0.41);
-  m1Command += m1Controller.update(desV, currV);
-  md.setM1Speed(constrain(m1Command, -400, 400));
+void MotorController::controlMR(float desV, float currV) {
+  desV = constrain(desV,-maxSpeed, maxSpeed);
+  mRCommand += mRController.update(desV, currV);
+  drive.setMRSpeed(constrain(mRCommand, -400, 400));
 }
-void MotorController::controlM2(float desV, float currV) {
-  desV = constrain(desV,-0.41, 0.41);
-  m2Command += m2Controller.update(desV, currV);
-  md.setM1Speed(constrain(m2Command, -400, 400));
+void MotorController::controlML(float desV, float currV) {
+  desV = constrain(desV,-maxSpeed, maxSpeed);
+  mLCommand += mLController.update(desV, currV);
+  drive.setMLSpeed(constrain(mLCommand, -400, 400));
 }

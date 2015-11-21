@@ -1,14 +1,12 @@
 #include "EncoderMeasurement.h"
 
-#include "encoders.h"
 #include "constants.h"
 #include "Arduino.h"
 
-//Encoder Measurement Class function implementation
-void EncoderMeasurement::initialize() {
-  initEncoders();       Serial.println("Encoders Initialized..."); //initialize Encoders
-  clearEncoderCount();  Serial.println("Encoders Cleared..."); //clear Encoder Counts
+#include "Drive.h"
 
+//Encoder Measurement Class function implementation
+EncoderMeasurement::EncoderMeasurement(Drive &drive) : drive(drive) {
   encoderRCount = 0;
   encoderLCount = 0;
   dEncoderR = 0;
@@ -27,8 +25,8 @@ void EncoderMeasurement::update() {
   float encoderRCountPrev = encoderRCount;
   float encoderLCountPrev = encoderLCount;
 
-  encoderRCount = readEncoder(1);
-  encoderLCount = -1 * readEncoder(2);
+  encoderRCount = drive.getMREncoder();
+  encoderLCount = drive.getMLEncoder();
 
   // unsigned overflow works in our favor here
   dEncoderR = encoderRCount - encoderRCountPrev;

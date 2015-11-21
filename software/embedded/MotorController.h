@@ -1,8 +1,8 @@
 #pragma once
 
-#include "DualMC33926MotorShield.h"
-
 #include "PIDController.h"
+
+class Drive;
 
 /*
 Class Name: PIController
@@ -17,18 +17,10 @@ External Variable Dependency:
 */
 class MotorController {
   public:
-    DualMC33926MotorShield md;
-    int m1Command; //reference command to motor 1 range from -400 to 400
-    int m2Command; //reference command to motor 2 range from -400 to 400
-    /*Function Name: initialize()
-    Effect: Initialize all public member variables of the class to 0
-    Modifies: All member variables
-    Requirement: None
-    Input: None
-    Output: None
-    Usage; Call this function upon instantiation of the class to a global object
-    */
-    void initialize();
+    MotorController(Drive &d);
+    int mRCommand; //reference command to motor 1 range from -400 to 400
+    int mLCommand; //reference command to motor 2 range from -400 to 400
+
     /*
     Effect: Actuate the motor with PI Controller.
     Modifies: All member variables
@@ -39,10 +31,11 @@ class MotorController {
     Output: None
     Usage: Call this function to change the velocity of the robot
     */
-    void controlM1(float desV, float currV);
-    void controlM2(float desV, float currV);
+    void controlMR(float desV, float currV);
+    void controlML(float desV, float currV);
 
   private:
-    PIDController m1Controller = PIDController(18, 2, 0);
-    PIDController m2Controller = PIDController(18, 2, 0);
+    Drive &drive;
+    PIDController mRController = PIDController(18, 2, 0);
+    PIDController mLController = PIDController(18, 2, 0);
 };

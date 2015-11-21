@@ -6,6 +6,7 @@
 #include "MotorController.h"
 #include "SerialCommunication.h"
 #include "PathPlanner.h"
+#include "Drive.h"
 
 class Main {
 public:
@@ -13,6 +14,8 @@ public:
   void setup();
   void loop();
 private:
+  Drive drive;
+
   EncoderMeasurement measureRobot; //instantiate encoder handler class
   RobotPosition robotPos; //instantiate robot position and orientation calculation class
   MotorController moveRobot; //instantiate velocity PI controller class
