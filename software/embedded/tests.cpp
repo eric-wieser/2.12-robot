@@ -20,7 +20,7 @@ void tests::motor_wiring() {
 		Serial.print("dr =");
 		Serial.print(diffr);
 		Serial.print(", dl =");
-		Serial.println(diffr);
+		Serial.println(diffl);
 	}
 	{
 		Serial.print("Motor L, forward: ");
@@ -35,7 +35,7 @@ void tests::motor_wiring() {
 		Serial.print("dr =");
 		Serial.print(diffr);
 		Serial.print(", dl =");
-		Serial.println(diffr);
+		Serial.println(diffl);
 
 void tests::encoder_wiring() {
 	Drive md;
