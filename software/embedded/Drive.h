@@ -14,7 +14,7 @@ public:
 	uint32_t getMREncoder() { return encA.read(); }
 
 	void setMLSpeed(int s) { md.setM2Speed(-s);}
-	uint32_t getMLEncoder() { return encB.read(); }
+	uint32_t getMLEncoder() { return -encB.read(); }
 
 	void resetEncoders() {
 		encA.clear();
