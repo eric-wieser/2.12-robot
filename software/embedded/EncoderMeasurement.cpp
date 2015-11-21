@@ -22,8 +22,8 @@ EncoderMeasurement::EncoderMeasurement(Drive &drive) : drive(drive) {
 }
 
 void EncoderMeasurement::update() {
-  float encoderRCountPrev = encoderRCount;
-  float encoderLCountPrev = encoderLCount;
+  uint32_t encoderRCountPrev = encoderRCount;
+  uint32_t encoderLCountPrev = encoderLCount;
 
   encoderRCount = drive.getMREncoder();
   encoderLCount = drive.getMLEncoder();
