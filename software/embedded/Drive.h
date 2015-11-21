@@ -21,13 +21,25 @@ public:
 		encB.clear();
 	}
 
+	bool faulted() {
+		return md.getFault();
+	}
+
+	bool clearFault() {
+		md.init();
+	}
+
 	Drive() {
 		encA.begin();
 		encB.begin();
 
+ 		delayMicroseconds(100);
+
 		encA.configure();
+ 		delayMicroseconds(100);
 		encB.configure();
 
+		resetEncoders();
 		md.init();
 	}
 };
