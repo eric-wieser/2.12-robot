@@ -74,9 +74,11 @@ void tests::measurements() {
 			prevTime = currTime;
 			measure.update();
 			i++;
-			if(i % 1 == 0) {
+			if(i % 5 == 0) {
+				Serial.print(prevTime);
+				Serial.print("\t");
 				Serial.print(measure.mVR);
-				Serial.print(", ");
+				Serial.print("\t");
 				Serial.println(measure.mVL);
 			}
 		}
@@ -100,7 +102,6 @@ void tests::motor_feedback() {
 
 			cont.controlMR(1, measure.mVR); // right motor PI control
 			cont.controlML(-1, measure.mVL); //left motor PI control
-			delay(10);
 
 			i++;
 			if(i % 10 == 0) {
