@@ -10,6 +10,7 @@ SerialCommunication::SerialCommunication() {
 
 void SerialCommunication::sendSerialData(const RobotPosition & robotPos) {
   if (micros() - prevSerialTime >= SERIAL_PERIOD_MICROS) {
+    Serial.print("P");
     Serial.print(robotPos.X, 6); //X
     Serial.print(",");
     Serial.print(robotPos.Y, 6); //Y
