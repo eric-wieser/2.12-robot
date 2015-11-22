@@ -19,7 +19,7 @@ External Variable Dependency:  None
 */
 class EncoderMeasurement {
   public:
-    EncoderMeasurement(Drive &drive);
+    EncoderMeasurement(const Drive &drive);
 
     float dThetaL;   //left wheel turned in radians
     float dThetaR;   //right wheel turned in radians

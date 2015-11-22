@@ -11,17 +11,17 @@ private:
 public:
 	// add sign corrections here. Positive should mean forward
 	void setMRSpeed(int s) { md.setM1Speed(s);}
-	uint32_t getMREncoder() { return encA.read(); }
+	uint32_t getMREncoder() const { return encA.read(); }
 
 	void setMLSpeed(int s) { md.setM2Speed(-s);}
-	uint32_t getMLEncoder() { return -encB.read(); }
+	uint32_t getMLEncoder() const { return -encB.read(); }
 
 	void resetEncoders() {
 		encA.clear();
 		encB.clear();
 	}
 
-	bool faulted() {
+	bool faulted() const {
 		return md.getFault();
 	}
 
