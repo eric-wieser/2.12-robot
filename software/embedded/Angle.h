@@ -7,6 +7,12 @@ A class representing an angle, and dealing with wraparound in [-PI, PI)
 
 	Angle + float -> Angle
 	Angle - float -> Angle
+
+Example:
+
+    float d_angle = Angle(1.5*M_PI) - Angle(0.25*M_PI);
+    assert(d_angle == -0.75*M_PI)
+
 */
 class Angle {
 private:
