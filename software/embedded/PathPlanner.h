@@ -30,15 +30,8 @@ class PathPlanner {
     float pathlast;
     Angle phiDesired;
     float pathDesired;
-    /*Function Name: initialize();
-    Effect: Initialize all public member variables of the class to 0
-    Modifies: All member variables
-    Requirement: None
-    Input: None
-    Output: None
-    Usage; Call this function upon instantiation of the class to a global object
-    */
-    void initialize();
+
+    PathPlanner();
     /*Function Name: void LabTestRun(const RobotPosition &robotPos);
     Effect: modify the member variable desiredMVL and desiredMVR based on the K and forwardVel member variable and trajectory logic
     Modifies: int currentTask;

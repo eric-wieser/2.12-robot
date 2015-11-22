@@ -29,15 +29,7 @@ class SerialCommunication {
     float commandY;
     float commandPhi;
     bool finished;
-    /*Function Name: initialize();
-    Effect: Initialize all public member variables of the class to 0 and prevSerialTime to micro()
-    Modifies: All member variables
-    Requirement: None
-    Input: None
-    Output: None
-    Usage; Call this function upon instantiation of the class to a global object
-    */
-    void initialize();
+    SerialCommunication();
     /*Function Name: sendSerialData(const RobotPosition & robotPos);
     Effect: report serial data to matlab
     Modifies: None

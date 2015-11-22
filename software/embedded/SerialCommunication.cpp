@@ -3,7 +3,7 @@
 #include "RobotPosition.h"
 
 //SerialCommunication Class function implementation
-void SerialCommunication::initialize() {
+SerialCommunication::SerialCommunication() {
   prevSerialTime = micros();
 }
 

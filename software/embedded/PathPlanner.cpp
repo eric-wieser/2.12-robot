@@ -5,7 +5,7 @@
 #include "constants.h"
 
 //PathPlanner Class function implementation
-void PathPlanner::initialize() {
+PathPlanner::PathPlanner() {
   currentTask = 1;
   desiredMVL = 0;
   desiredMVR = 0;
