@@ -5,6 +5,7 @@
 //SerialCommunication Class function implementation
 SerialCommunication::SerialCommunication() {
   prevSerialTime = micros();
+  finished = true;
 }
 
 void SerialCommunication::sendSerialData(const RobotPosition & robotPos) {
