@@ -1,3 +1,12 @@
+/**
+This file contains a set of tests than can be run all by themselves.
+
+To run any one of these tests, add a line to setup() to invoke the function, ie
+
+tests::motor_wiring();
+
+and delete the contents of loop()
+*/
 #include "tests.h"
 
 #include "Drive.h"
@@ -8,6 +17,15 @@
 #include "PathPlanner.h"
 #include "constants.h"
 
+/**
+Tests that the motors are wired up correctly.
+
+When running, verify that the motor and direction printed over serial is what
+is observed on the robot.
+
+Also prints the change in encoder values after each movement - expect the
+readings to positive, and correspond with the motor that moved
+*/
 void tests::motor_wiring() {
 	Drive md;
 
@@ -45,6 +63,9 @@ void tests::motor_wiring() {
 	}
 }
 
+/**
+Tests that the encoders work when the motors are spun BY HAND
+*/
 void tests::encoder_wiring() {
 	Drive md;
 
@@ -59,6 +80,10 @@ void tests::encoder_wiring() {
 	}
 }
 
+/**
+Tests that the encoder measurements are being correctly translated into
+wheel speeds
+*/
 void tests::measurements() {
 	Drive md;
 	EncoderMeasurement measure(md);
@@ -85,7 +110,9 @@ void tests::measurements() {
 	}
 }
 
-
+/**
+Tests that the PID controllers work
+*/
 void tests::motor_feedback() {
 	Drive md;
 
