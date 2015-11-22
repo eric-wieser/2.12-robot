@@ -21,14 +21,14 @@ class EncoderMeasurement {
   public:
     EncoderMeasurement(const Drive &drive);
 
-    float dThetaL;   //left wheel turned in radians
-    float dThetaR;   //right wheel turned in radians
+    float dThetaL;  //left wheel turned in radians
+    float dThetaR;  //right wheel turned in radians
     float dWheelR;  //increment wheel 1 distance
     float dWheelL;  //increment wheel 2 distance
-    float totalWheelR; //total wheel 1 distance
+    float totalWheelR;  //total wheel 1 distance
     float totalWheelL;  //total wheel 2 distance
-    float mVR; // right wheel velocity in m/s
-    float mVL; // left wheel velocity in m/s
+    float mVR;  // right wheel velocity in m/s
+    float mVL;  // left wheel velocity in m/s
     /*
     Function Name: update(float dThetaL, float dThetaR);
     Effect: Update the encoder count and incremental angle of the cycle.

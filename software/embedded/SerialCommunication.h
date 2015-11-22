@@ -10,9 +10,6 @@ class RobotPosition;
 #define SERIAL_PERIOD 0.01
 #define SERIAL_PERIOD_MICROS 10000
 
-extern unsigned long currentSerialTime;
-extern unsigned long prevSerialTime;
-
 
 /*
 Class Name: SerialCommunication
