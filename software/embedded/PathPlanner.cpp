@@ -1,8 +1,9 @@
 #include "PathPlanner.h"
 
+#include "Arduino.h"
+#include "constants.h"
 #include "RobotPosition.h"
 #include "SerialCommunication.h"
-#include "constants.h"
 
 //PathPlanner Class function implementation
 PathPlanner::PathPlanner() {
@@ -56,71 +57,125 @@ void PathPlanner::computeDesiredV(float forwardVel, float K) {
   desiredMVL = forwardVel * (1 - K * b);
 }
 
-bool PathPlanner::OrientationController(const RobotPosition & robotPos,
-                                        const SerialCommunication & reportData,
-                                        float kp) {
-  float distEps = 0.025; //2.5 cm
-
-  float dx = reportData.commandX - robotPos.X;
-  float dy = reportData.commandY - robotPos.Y;
-  bool closeEnough = dx*dx + dy*dy > distEps*distEps;
-  if(closeEnough) {
-    return true;
+void PathPlanner::OrientationController(const RobotPosition & robotPos, SerialCommunication & reportData) {
+  float eps = .01;
+  float KPhi = .50;
+  float delY = reportData.commandY - robotPos.Y;
+  float delX = reportData.commandX - robotPos.X;
+  phiGoal = atan2((delY), (delX));
+  float currentPhiError = fmod(phiGoal - robotPos.Phi + PI, 2*PI) - PI;
+  if (currentPhiError > PI/3 || currentPhiError < PI/18){
+    KPhi = 10.0;
   }
-  phiGoal = atan2(dy, dx);
 
-  // P controller
-  const float unsaturatedKphi = 0.41 / PI;  // full speed at full error
-  float KPhi = unsaturatedKphi * kp;
-  float currentPhiError = phiGoal - robotPos.Phi;
+  desiredMVR += KPhi * currentPhiError*2.0*b;
+  desiredMVL -= KPhi * currentPhiError*2.0*b;
 
-  // normalize error within [-PI, PI)
-  while(currentPhiError >= PI) currentPhiError -= PI;
-  while(currentPhiError < -PI) currentPhiError += PI;
-
-  // modify desired velocities
-  float deltaVel = currentPhiError * KPhi;
-  desiredMVR += deltaVel;
-  desiredMVL -= deltaVel;
-
-  return false;
+  if( abs(delX) < eps && abs(delY) < eps) {
+  reportData.updateStatus(true);
+  }
 }
 
 void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication & reportData) {
-  if(currentTask == 1) {
-    // the robot is waiting to receive command (x,y)
-    desiredMVR = desiredMVL = 0;
-
-    if(!reportData.finished) currentTask = 2;
+  //take next point (X,Y) positions given by MatLab, calculate phi to turn towards, then go straight
+  phiGoal = atan2((reportData.commandY - ylast), (reportData.commandX - xlast));
+  //pathGoal = sqrt((reportData.commandX - xlast) * (reportData.commandX - xlast) + (reportData.commandY - ylast) * (reportData.commandY - ylast)) + pathlast;
+  // constrain the error in phi to the [-pi, pi)
+  float lastPhiError = fmod(phiGoal - philast + PI, 2*PI) - PI;
+  float currentPhiError = fmod(phiGoal - robotPos.Phi + PI, 2*PI) - PI;
+  if (currentTask == 0) { // waiting to receive command x,y
+    desiredMVR = 0;
+    desiredMVL = 0;
+    if (!reportData.finished){
+      currentTask = 1;
+    }
   }
-  else if(currentTask == 2) {
-    desiredMVL = desiredMVR = 0;
-    OrientationController(robotPos, reportData, 8);
+  if (currentTask == 1) { //turn towards next point
+    if (lastPhiError > 0 || (lastPhiError <0 && 2*PI-abs(lastPhiError)<PI)){ //turn counter clock wise
+      if (currentPhiError >= 0){
+        desiredMVR = 0.2;
+        desiredMVL = -0.2;
+      } else {
+        desiredMVR = 0;
+        desiredMVL = 0;
+        currentTask = 2;
+        float pathAfterTurn = robotPos.pathDistance;
+        pathGoal = pathAfterTurn+sqrt((reportData.commandX - robotPos.X) * (reportData.commandX - robotPos.X) + (reportData.commandY - robotPos.Y) * (reportData.commandY - robotPos.Y));
 
-    const float phiEps = PI / 180 * 2.5;
+      }
+    }
+    if (lastPhiError < 0 || (lastPhiError > 0 && 2*PI-abs(lastPhiError)<PI)){ //turn clock wise
+      if (currentPhiError <= 0){
+        desiredMVR = -0.2;
+        desiredMVL = 0.2;
+      } else {
+        desiredMVR = 0;
+        desiredMVL = 0;
+        currentTask = 2;
+        float pathAfterTurn = robotPos.pathDistance;
+        pathGoal = pathAfterTurn+sqrt((reportData.commandX - robotPos.X) * (reportData.commandX - robotPos.X) + (reportData.commandY - robotPos.Y) * (reportData.commandY - robotPos.Y));
 
-    if(abs(phiGoal - robotPos.Phi) < phiEps) currentTask = 3;
+      }
+    }
+    if (lastPhiError == 0) { //don't need to turn
+      currentTask = 2;
+      float pathAfterTurn = robotPos.pathDistance;
+      pathGoal = pathAfterTurn+sqrt((reportData.commandX - robotPos.X) * (reportData.commandX - robotPos.X) + (reportData.commandY - robotPos.Y) * (reportData.commandY - robotPos.Y));
+    }
   }
-  else if(currentTask == 3) {
-    // the robot is going straight toward the next way point
-    desiredMVL = 0.3;
-    desiredMVR = 0.3;
-    bool done = OrientationController(robotPos, reportData, 2);
-    reportData.updateStatus(done);
 
-    if(reportData.finished) currentTask = 1;
+  if (currentTask == 2) { //now go straight to next point
+    if (robotPos.pathDistance < pathGoal ) { //if we aren't there yet, keep going
+      computeDesiredV(.2, 0);
+      OrientationController(robotPos, reportData);
+    } else { //if we are there, stop and move on to the next task
+      computeDesiredV(0, 0);
+      currentTask = 0;
+      xlast = robotPos.X;
+      ylast = robotPos.Y;
+      philast = robotPos.Phi;
+      pathlast = robotPos.pathDistance;
+      Serial.println("NEXT POINT");
+      reportData.updateStatus(true);
+    }
   }
-  /* Here separate task into three cases:
-  if currentTask = 1, 
-  if currentTask = 2, the robot is turning to face the next way point
-  if currentTask = 3, the robot is going straight toward the next way point
+}
 
-  Note for task 1, you need a condition to check whether a new way point is received
+void PathPlanner::turnAndGo(const RobotPosition & robotPos, const SerialCommunication & reportData) {
+  //take next point (X,Y) positions given by MatLab, calculate phi to turn towards, then go forward and turn at the same time
+  phiGoal = tan((reportData.commandY - ylast) / (reportData.commandX - xlast));
 
-  For task 2, use lastPhiError to check if the robot need to turn clockwise or counter clockwise.
-  If there is lastPhiError = 0, then the robot does not need to turn.
+  if (philast > phiGoal){ //turn clock wise
+    phiDesired = tan((reportData.commandY - robotPos.Y) / (reportData.commandX - robotPos.X));
 
-  End with a condition that tells us that the way point has been reached
-  e.g., reportData.updateStatus(true);
-  */
+    if (robotPos.Phi > phiDesired) { //if we are not pointing directly at the way point, keep going and turning
+      computeDesiredV(.2, -4);
+      pathDesired = sqrt((reportData.commandX - robotPos.X) * (reportData.commandX - robotPos.X) + (reportData.commandY - robotPos.Y) * (reportData.commandY - robotPos.Y))+robotPos.pathDistance;
+    } else if (robotPos.pathDistance < pathDesired) { //if we are pointing toward the way point but not there yet, keep going straight
+      computeDesiredV(.2, 0);
+    } else { //if we are there, stop and move on to the next task
+      desiredMVR = 0;
+      desiredMVL = 0;
+      xlast = robotPos.X;
+      ylast = robotPos.Y;
+      philast = robotPos.Phi;
+      pathlast = robotPos.pathDistance;
+      Serial.println("NEXT POINT");
+    }
+  } else { //turn counter clock wise
+      phiDesired = tan((reportData.commandY - robotPos.Y) / (reportData.commandX - robotPos.X));
+    if (robotPos.Phi < phiDesired) { //if we are not pointing directly at the way point, keep going and turning
+      computeDesiredV(.2, 4);
+      pathDesired = sqrt((reportData.commandX - robotPos.X) * (reportData.commandX - robotPos.X) + (reportData.commandY - robotPos.Y) * (reportData.commandY - robotPos.Y))+robotPos.pathDistance;
+    } else if (robotPos.pathDistance < pathDesired) { //if we are pointing toward the way point but not there yet, keep going straight
+      computeDesiredV(.2, 0);
+    } else { //if we are there, stop and move on to the next task
+      computeDesiredV(0, 0);
+      xlast = robotPos.X;
+      ylast = robotPos.Y;
+      philast = robotPos.Phi;
+      pathlast = robotPos.pathDistance;
+      Serial.println("NEXT POINT");
+    }
+  }
 }
