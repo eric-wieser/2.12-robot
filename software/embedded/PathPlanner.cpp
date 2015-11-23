@@ -11,8 +11,6 @@ PathPlanner::PathPlanner() {
   desiredMVL = 0;
   desiredMVR = 0;
   phiGoal = 0;
-  philast = 0;
-  pathlast = 0;
   phiDesired = 0;
   pathDesired = 0;
 }
@@ -75,9 +73,9 @@ void PathPlanner::OrientationController(const RobotPosition & robotPos, SerialCo
 
 void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication & reportData) {
   //take next point (X,Y) positions given by MatLab, calculate phi to turn towards, then go straight
-  Angle phiGoal = (reportData.commandPos - lastPos).angle();
+  Angle phiGoal = (reportData.commandPos - lastRobotPos.pos).angle();
   // constrain the error in phi to the [-pi, pi)
-  float lastPhiError = phiGoal - Angle(philast);
+  float lastPhiError = phiGoal - Angle(lastRobotPos.Phi);
   float currentPhiError = phiGoal - Angle(robotPos.Phi);
   Vector dpos = reportData.commandPos - robotPos.pos;
 
@@ -124,9 +122,7 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
     } else { //if we are there, stop and move on to the next task
       computeDesiredV(0, 0);
       currentTask = 0;
-      lastPos = robotPos.pos;
-      philast = robotPos.Phi;
-      pathlast = robotPos.pathDistance;
+      lastRobotPos = robotPos;
       Serial.println("NEXT POINT");
       reportData.updateStatus(true);
     }

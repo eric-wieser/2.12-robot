@@ -3,7 +3,7 @@
 #include "Angle.h"
 #include "Vector.h"
 
-class RobotPosition;
+#include "RobotPosition.h"
 class SerialCommunication;
 
 /*
@@ -25,9 +25,7 @@ class PathPlanner {
     float desiredMVR;
     Angle phiGoal;
     float pathGoal;
-    Vector lastPos;
-    Angle philast;
-    float pathlast;
+    RobotPosition lastRobotPos;
     Angle phiDesired;
     float pathDesired;
 
