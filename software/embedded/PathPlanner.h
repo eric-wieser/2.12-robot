@@ -67,23 +67,7 @@ class PathPlanner {
     Usage; Call this function in each timed loop to update the desired wheel velocity
     */
     void turnToGo(const RobotPosition & robotPos, SerialCommunication & reportData);
-     /*Function Name: void turnAndGo(const RobotPosition & robotPos);
-    Effect: modify the member variable desiredMVL and desiredMVR based on the next goal position (X,Y) to turn and go at the same time
-    Modifies: 1. int currentTask;
-              2. float phiGoal;          
-              3. float xlast;
-              4. float ylast;
-              5. float philast;
-              6. float phiDesired;
-              7. float pathDesired;
-    Requirement: None
-    Input: None
-    Output: None
-    Usage; Call this function in each timed loop to update the desired wheel velocity
-    */
-    void turnAndGo(const RobotPosition & robotPos, const SerialCommunication & reportData);
-    
-    
+
     /*Function Name: void OrientationController(const RobotPosition & robotPos, SerialCommunication & reportData);
     Effect: modify the member variable desiredMVL and desiredMVR based on the next goal position (X,Y) to turn the heading to align with the next point.
     Modifies: 1. float desiredMVL;
