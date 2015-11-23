@@ -83,6 +83,9 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
   // constrain the error in phi to the [-pi, pi)
   float lastPhiError = fmod(phiGoal - philast + PI, 2*PI) - PI;
   float currentPhiError = fmod(phiGoal - robotPos.Phi + PI, 2*PI) - PI;
+  float dx = reportData.commandX - robotPos.X;
+  float dy = reportData.commandY - robotPos.Y;
+
   if (currentTask == 0) { // waiting to receive command x,y
     desiredMVR = 0;
     desiredMVL = 0;
@@ -99,9 +102,7 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
         desiredMVR = 0;
         desiredMVL = 0;
         currentTask = 2;
-        float pathAfterTurn = robotPos.pathDistance;
-        pathGoal = pathAfterTurn+sqrt((reportData.commandX - robotPos.X) * (reportData.commandX - robotPos.X) + (reportData.commandY - robotPos.Y) * (reportData.commandY - robotPos.Y));
-
+        pathGoal = robotPos.pathDistance + sqrt(dx*dx + dy*dy);
       }
     }
     if (lastPhiError < 0 || (lastPhiError > 0 && 2*PI-abs(lastPhiError)<PI)){ //turn clock wise
@@ -112,15 +113,13 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
         desiredMVR = 0;
         desiredMVL = 0;
         currentTask = 2;
-        float pathAfterTurn = robotPos.pathDistance;
-        pathGoal = pathAfterTurn+sqrt((reportData.commandX - robotPos.X) * (reportData.commandX - robotPos.X) + (reportData.commandY - robotPos.Y) * (reportData.commandY - robotPos.Y));
+        pathGoal = robotPos.pathDistance + sqrt(dx*dx + dy*dy);
 
       }
     }
     if (lastPhiError == 0) { //don't need to turn
       currentTask = 2;
-      float pathAfterTurn = robotPos.pathDistance;
-      pathGoal = pathAfterTurn+sqrt((reportData.commandX - robotPos.X) * (reportData.commandX - robotPos.X) + (reportData.commandY - robotPos.Y) * (reportData.commandY - robotPos.Y));
+      pathGoal = robotPos.pathDistance + sqrt(dx*dx + dy*dy);
     }
   }
 
