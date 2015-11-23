@@ -29,6 +29,9 @@ public:
 	inline Angle angle() {
 		return atan2(y, x);
 	}
+	inline Vector rotCCW() {
+		return Vector(-y, x);
+	}
 };
 
 template<typename T>
