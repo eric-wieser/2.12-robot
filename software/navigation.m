@@ -120,16 +120,20 @@ function navigation
         end
         cla(f_a);
         axis 'equal';
-        robotXCenter = xPos(windowWidth*3);
-        robotYCenter = yPos(windowWidth*3);
-    	robotBlob = patch([robotXCenter-robotSize robotXCenter-robotSize robotXCenter robotXCenter+robotSize robotXCenter+robotSize], [robotYCenter-robotSize robotYCenter+robotSize robotYCenter+1.5*robotSize robotYCenter+robotSize robotYCenter-robotSize], blobColor);
-        %Rotate the robot so that it points correctly
-        rotate(robotBlob, [0,0,1], newAngle - 90, [robotXCenter, robotYCenter, 0]);
-        %Draw the pre-defined path trajectory
         hold on;
 
-        p = plot(f_a, xPos, yPos, '.');
-        %plot(xPos,yPos,'.');
+        robotXCenter = xPos(windowWidth*3);
+        robotYCenter = yPos(windowWidth*3);
+    	robotBlob = patch(...
+            robotXCenter + [-robotSize -robotSize 0             robotSize  robotSize],...
+            robotYCenter + [-robotSize  robotSize 1.5*robotSize robotSize -robotSize],...
+            blobColor);
+        rotate(robotBlob, [0,0,1], newAngle - 90, [robotXCenter, robotYCenter, 0]);
+
+        % draw the center of the robot
+        plot(f_a, robotXCenter, robotYCenter, 'o', 'Color', blobColor);
+
+        plot(f_a, xPos, yPos, '.');
 
         if (strcmp(send_mode, 'Automatic'))
             plot(f_a,command_X, command_Y,'-');
@@ -140,8 +144,8 @@ function navigation
             plot(nextData(1), nextData(2),'*');
         end
 
-        
-        set(f,'Visible','on');% Make the GUI visible.
+        % Make the GUI visible.
+        set(f,'Visible','on');
         drawnow
 
         %Logic for handling 'Automatic' mode operation
