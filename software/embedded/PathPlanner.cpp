@@ -51,22 +51,22 @@ void PathPlanner::computeDesiredV(float forwardVel, float K) {
   desiredMVL = forwardVel * (1 - K * b);
 }
 
-void PathPlanner::OrientationController(const RobotPosition & robotPos, SerialCommunication & reportData) {
-  float eps = .01;
+bool PathPlanner::OrientationController(const RobotPosition & robotPos, SerialCommunication & reportData) {
+  const float eps = .01;
   float KPhi = .50;
+
   Vector delta = reportData.commandPos - robotPos.pos;
   Angle phiGoal = delta.angle();
-  float currentPhiError = fmod(phiGoal - robotPos.Phi + PI, 2*PI) - PI;
-  if (currentPhiError > PI/3 || currentPhiError < PI/18){
+  float phiError = phiGoal - robotPos.Phi;
+
+  if (abs(phiError) > PI/3){
     KPhi = 10.0;
   }
 
-  desiredMVR += KPhi * currentPhiError*2.0*b;
-  desiredMVL -= KPhi * currentPhiError*2.0*b;
+  desiredMVR += KPhi * phiError*2.0*b;
+  desiredMVL -= KPhi * phiError*2.0*b;
 
-  if( delta.magnitudeSq() < eps*eps) {
-    reportData.updateStatus(true);
-  }
+  return delta.magnitudeSq() < eps*eps;
 }
 
 void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication & reportData) {
@@ -84,39 +84,32 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
       currentTask = 1;
     }
   }
+
   if (currentTask == 1) { //turn towards next point
-    if (lastPhiError > 0) { //turn counter clock wise
-      if (currentPhiError >= 0){
-        desiredMVR = 0.2;
-        desiredMVL = -0.2;
-      } else {
-        desiredMVR = 0;
-        desiredMVL = 0;
-        currentTask = 2;
-        pathGoal = robotPos.pathDistance + dpos.magnitude();
-      }
+    //turn counter clock wise
+    if (lastPhiError > 0 && currentPhiError > 0) {
+      desiredMVR = 0.2;
+      desiredMVL = -0.2;
     }
-    if (lastPhiError < 0) { //turn clock wise
-      if (currentPhiError <= 0){
-        desiredMVR = -0.2;
-        desiredMVL = 0.2;
-      } else {
-        desiredMVR = 0;
-        desiredMVL = 0;
-        currentTask = 2;
-        pathGoal = robotPos.pathDistance + dpos.magnitude();
-      }
+    // turn clockwise
+    else if (lastPhiError < 0 && currentPhiError < 0) {
+      desiredMVR = -0.2;
+      desiredMVL = 0.2;
     }
-    if (lastPhiError == 0) { //don't need to turn
+    // move on
+    else {
+      desiredMVR = 0;
+      desiredMVL = 0;
       currentTask = 2;
       pathGoal = robotPos.pathDistance + dpos.magnitude();
     }
   }
 
   if (currentTask == 2) { //now go straight to next point
-    if (robotPos.pathDistance < pathGoal ) { //if we aren't there yet, keep going
+    if (robotPos.pathDistance < pathGoal) { //if we aren't there yet, keep going
       computeDesiredV(.2, 0);
-      OrientationController(robotPos, reportData);
+      bool done = OrientationController(robotPos, reportData);
+      if(done) reportData.updateStatus(true);
     } else { //if we are there, stop and move on to the next task
       computeDesiredV(0, 0);
       currentTask = 0;

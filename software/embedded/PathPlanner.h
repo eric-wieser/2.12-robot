@@ -75,7 +75,7 @@ class PathPlanner {
     Output: None
     Usage; Call this function in each timed loop to update the desired wheel velocity
     */
-    void OrientationController(const RobotPosition & robotPos, SerialCommunication & reportData);
+    bool OrientationController(const RobotPosition & robotPos, SerialCommunication & reportData);
 
 
 
