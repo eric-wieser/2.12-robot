@@ -1,11 +1,13 @@
 #pragma once
 
 #include <math.h>
+#include "Angle.h"
 
 class Vector {
 public:
 	float x, y;
 	Vector(float x, float y) : x(x), y(y) {}
+	Vector() : Vector(0, 0) {}
 
 	friend inline Vector operator +(Vector a, Vector b) { return Vector(a.x+b.x, a.y+b.y); }
 	friend inline Vector operator -(Vector a, Vector b) { return Vector(a.x-b.x, a.y-b.y); }
@@ -23,6 +25,9 @@ public:
 
 	inline Vector projectionOn(Vector v) {
 		return v * (dot(v) / v.magnitudeSq());
+	}
+	inline Angle angle() {
+		return atan2(y, x);
 	}
 };
 

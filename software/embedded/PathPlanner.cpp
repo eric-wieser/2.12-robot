@@ -11,8 +11,6 @@ PathPlanner::PathPlanner() {
   desiredMVL = 0;
   desiredMVR = 0;
   phiGoal = 0;
-  xlast = 0;
-  ylast = 0;
   philast = 0;
   pathlast = 0;
   phiDesired = 0;
@@ -60,9 +58,8 @@ void PathPlanner::computeDesiredV(float forwardVel, float K) {
 void PathPlanner::OrientationController(const RobotPosition & robotPos, SerialCommunication & reportData) {
   float eps = .01;
   float KPhi = .50;
-  float delY = reportData.commandY - robotPos.Y;
-  float delX = reportData.commandX - robotPos.X;
-  Angle phiGoal = atan2(delY, delX);
+  Vector delta = reportData.commandPos - robotPos.pos;
+  Angle phiGoal = delta.angle();
   float currentPhiError = fmod(phiGoal - robotPos.Phi + PI, 2*PI) - PI;
   if (currentPhiError > PI/3 || currentPhiError < PI/18){
     KPhi = 10.0;
@@ -71,19 +68,18 @@ void PathPlanner::OrientationController(const RobotPosition & robotPos, SerialCo
   desiredMVR += KPhi * currentPhiError*2.0*b;
   desiredMVL -= KPhi * currentPhiError*2.0*b;
 
-  if( abs(delX) < eps && abs(delY) < eps) {
-  reportData.updateStatus(true);
+  if( delta.magnitudeSq() < eps*eps) {
+    reportData.updateStatus(true);
   }
 }
 
 void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication & reportData) {
   //take next point (X,Y) positions given by MatLab, calculate phi to turn towards, then go straight
-  Angle phiGoal = atan2((reportData.commandY - ylast), (reportData.commandX - xlast));
+  Angle phiGoal = (reportData.commandPos - lastPos).angle();
   // constrain the error in phi to the [-pi, pi)
   float lastPhiError = phiGoal - Angle(philast);
   float currentPhiError = phiGoal - Angle(robotPos.Phi);
-  float dx = reportData.commandX - robotPos.X;
-  float dy = reportData.commandY - robotPos.Y;
+  Vector dpos = reportData.commandPos - robotPos.pos;
 
   if (currentTask == 0) { // waiting to receive command x,y
     desiredMVR = 0;
@@ -101,7 +97,7 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
         desiredMVR = 0;
         desiredMVL = 0;
         currentTask = 2;
-        pathGoal = robotPos.pathDistance + sqrt(dx*dx + dy*dy);
+        pathGoal = robotPos.pathDistance + dpos.magnitude();
       }
     }
     if (lastPhiError < 0) { //turn clock wise
@@ -112,12 +108,12 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
         desiredMVR = 0;
         desiredMVL = 0;
         currentTask = 2;
-        pathGoal = robotPos.pathDistance + sqrt(dx*dx + dy*dy);
+        pathGoal = robotPos.pathDistance + dpos.magnitude();
       }
     }
     if (lastPhiError == 0) { //don't need to turn
       currentTask = 2;
-      pathGoal = robotPos.pathDistance + sqrt(dx*dx + dy*dy);
+      pathGoal = robotPos.pathDistance + dpos.magnitude();
     }
   }
 
@@ -128,8 +124,7 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
     } else { //if we are there, stop and move on to the next task
       computeDesiredV(0, 0);
       currentTask = 0;
-      xlast = robotPos.X;
-      ylast = robotPos.Y;
+      lastPos = robotPos.pos;
       philast = robotPos.Phi;
       pathlast = robotPos.pathDistance;
       Serial.println("NEXT POINT");

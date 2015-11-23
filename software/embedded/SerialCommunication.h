@@ -2,6 +2,7 @@
 
 // needed for String
 #include "Arduino.h"
+#include "Vector.h"
 
 // forward declaration
 class RobotPosition;
@@ -25,8 +26,7 @@ External Variable Dependency:
 class SerialCommunication {
   public:
     float command[10];
-    float commandX;
-    float commandY;
+    Vector commandPos;
     float commandPhi;
     bool finished;
     SerialCommunication();

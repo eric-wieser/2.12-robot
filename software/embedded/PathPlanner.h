@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Angle.h"
+#include "Vector.h"
 
 class RobotPosition;
 class SerialCommunication;
@@ -24,8 +25,7 @@ class PathPlanner {
     float desiredMVR;
     Angle phiGoal;
     float pathGoal;
-    float xlast;
-    float ylast;
+    Vector lastPos;
     Angle philast;
     float pathlast;
     Angle phiDesired;
