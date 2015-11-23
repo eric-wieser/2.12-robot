@@ -11,8 +11,6 @@ PathPlanner::PathPlanner() {
   desiredMVL = 0;
   desiredMVR = 0;
   phiGoal = 0;
-  phiDesired = 0;
-  pathDesired = 0;
 }
 
 void PathPlanner::LabTestRun(const RobotPosition & robotPos) {

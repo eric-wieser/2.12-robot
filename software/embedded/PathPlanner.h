@@ -26,8 +26,6 @@ class PathPlanner {
     Angle phiGoal;
     float pathGoal;
     RobotPosition lastRobotPos;
-    Angle phiDesired;
-    float pathDesired;
 
     PathPlanner();
     /*Function Name: void LabTestRun(const RobotPosition &robotPos);
@@ -52,7 +50,7 @@ class PathPlanner {
     */
     void computeDesiredV(float forwardVel, float K);
     /*Function Name: void turnToGo1(const RobotPosition & robotPos);
-    Effect: modify the member variable desiredMVL and desiredMVR based on the next goal position (X,Y) 
+    Effect: modify the member variable desiredMVL and desiredMVR based on the next goal position (X,Y)
     Modifies: 1. int currentTask;
               2. float phiGoal;
               3. float pathGoal;
@@ -69,18 +67,18 @@ class PathPlanner {
     /*Function Name: void OrientationController(const RobotPosition & robotPos, SerialCommunication & reportData);
     Effect: modify the member variable desiredMVL and desiredMVR based on the next goal position (X,Y) to turn the heading to align with the next point.
     Modifies: 1. float desiredMVL;
-              2. float desiredMVR;        
+              2. float desiredMVR;
               2. float phiGoal;
-              
+
     Requirement: None
     Input: None
     Output: None
     Usage; Call this function in each timed loop to update the desired wheel velocity
     */
     void OrientationController(const RobotPosition & robotPos, SerialCommunication & reportData);
- 
- 
- 
+
+
+
   private:
     unsigned long prevSerialTime;
 };
