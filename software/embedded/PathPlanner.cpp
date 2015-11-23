@@ -94,7 +94,7 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
     }
   }
   if (currentTask == 1) { //turn towards next point
-    if (lastPhiError > 0 || (lastPhiError <0 && PI < abs(lastPhiError))){ //turn counter clock wise
+    if (lastPhiError > 0 || lastPhiError < -PI) { //turn counter clock wise
       if (currentPhiError >= 0){
         desiredMVR = 0.2;
         desiredMVL = -0.2;
@@ -105,7 +105,7 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
         pathGoal = robotPos.pathDistance + sqrt(dx*dx + dy*dy);
       }
     }
-    if (lastPhiError < 0 || (lastPhiError > 0 && PI < abs(lastPhiError) )){ //turn clock wise
+    if (lastPhiError < 0 || lastPhiError > PI) { //turn clock wise
       if (currentPhiError <= 0){
         desiredMVR = -0.2;
         desiredMVL = 0.2;
