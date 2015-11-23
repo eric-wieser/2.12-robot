@@ -62,7 +62,7 @@ void PathPlanner::OrientationController(const RobotPosition & robotPos, SerialCo
   float KPhi = .50;
   float delY = reportData.commandY - robotPos.Y;
   float delX = reportData.commandX - robotPos.X;
-  phiGoal = atan2((delY), (delX));
+  Angle phiGoal = atan2(delY, delX);
   float currentPhiError = fmod(phiGoal - robotPos.Phi + PI, 2*PI) - PI;
   if (currentPhiError > PI/3 || currentPhiError < PI/18){
     KPhi = 10.0;
@@ -78,11 +78,10 @@ void PathPlanner::OrientationController(const RobotPosition & robotPos, SerialCo
 
 void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication & reportData) {
   //take next point (X,Y) positions given by MatLab, calculate phi to turn towards, then go straight
-  phiGoal = atan2((reportData.commandY - ylast), (reportData.commandX - xlast));
-  //pathGoal = sqrt((reportData.commandX - xlast) * (reportData.commandX - xlast) + (reportData.commandY - ylast) * (reportData.commandY - ylast)) + pathlast;
+  Angle phiGoal = atan2((reportData.commandY - ylast), (reportData.commandX - xlast));
   // constrain the error in phi to the [-pi, pi)
-  float lastPhiError = fmod(phiGoal - philast + PI, 2*PI) - PI;
-  float currentPhiError = fmod(phiGoal - robotPos.Phi + PI, 2*PI) - PI;
+  float lastPhiError = phiGoal - Angle(philast);
+  float currentPhiError = phiGoal - Angle(robotPos.Phi);
   float dx = reportData.commandX - robotPos.X;
   float dy = reportData.commandY - robotPos.Y;
 
@@ -94,7 +93,7 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
     }
   }
   if (currentTask == 1) { //turn towards next point
-    if (lastPhiError > 0 || lastPhiError < -PI) { //turn counter clock wise
+    if (lastPhiError > 0) { //turn counter clock wise
       if (currentPhiError >= 0){
         desiredMVR = 0.2;
         desiredMVL = -0.2;
@@ -105,7 +104,7 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
         pathGoal = robotPos.pathDistance + sqrt(dx*dx + dy*dy);
       }
     }
-    if (lastPhiError < 0 || lastPhiError > PI) { //turn clock wise
+    if (lastPhiError < 0) { //turn clock wise
       if (currentPhiError <= 0){
         desiredMVR = -0.2;
         desiredMVL = 0.2;
@@ -114,7 +113,6 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
         desiredMVL = 0;
         currentTask = 2;
         pathGoal = robotPos.pathDistance + sqrt(dx*dx + dy*dy);
-
       }
     }
     if (lastPhiError == 0) { //don't need to turn
