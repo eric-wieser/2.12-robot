@@ -80,8 +80,13 @@ function navigation
             try
                 packet = arduino.recv_packet();
             catch e
-                disp(['Packet error' e.message]);
-				continue
+				switch e.identifier
+					case 'arduino:decode:truncated'
+						disp(['Packet error' e.message]);
+						continue
+					otherwise
+						rethrow(e)
+				end
             end
             if isempty(packet)
                 if any_packet
