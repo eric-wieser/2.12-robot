@@ -84,6 +84,7 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
   }
 
   if (currentTask == 1) { //turn towards next point
+    static const Spline turnSpline(0, 1, 0.3, 0.1);
 
     // interpolate our motor speeds quadratically in angle
     float through_turn = unlerp(turnBegin, turnEnd, robotPos.Phi);

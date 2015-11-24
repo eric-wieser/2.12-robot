@@ -28,7 +28,6 @@ class PathPlanner {
     float pathGoal;
     RobotPosition lastRobotPos;
 
-    Spline turnSpline = Spline(0, 1, 0.2, 0.2);
     Angle turnBegin;
     Angle turnEnd;
 
