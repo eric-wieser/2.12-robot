@@ -14,19 +14,14 @@ Sept. 2015
 #include "constants.h"
 
 Main::Main() : measureRobot(drive), moveRobot(drive) {
-
-  currentTime = micros(); //initialize timer
-  prevTime = micros(); //initialize timer
-  reportData.initialize(); //initialize matlab plot serial communication
-  pathPlanner.initialize(); //initialize path planner
+  prevTime = micros();
   delay(1e3);// set a delay so the robot doesn't drive off without you
-
 }
 
 void Main::loop() {
   //timed loop implementation
-  if (micros() - prevTime >= PERIOD_MICROS) {
-    currentTime = micros();
+  uint32_t currentTime = micros();
+  if (currentTime - prevTime >= PERIOD_MICROS) {
     measureRobot.update(); //check encoder
     robotPos.update(measureRobot.dThetaL, measureRobot.dThetaR); //update position
 

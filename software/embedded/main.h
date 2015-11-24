@@ -22,6 +22,5 @@ private:
   SerialCommunication reportData;
   PathPlanner pathPlanner;
 
-  unsigned long currentTime;
-  unsigned long prevTime;
+  uint32_t prevTime;
 };

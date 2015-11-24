@@ -3,15 +3,17 @@
 #include "RobotPosition.h"
 
 //SerialCommunication Class function implementation
-void SerialCommunication::initialize() {
+SerialCommunication::SerialCommunication() {
   prevSerialTime = micros();
+  finished = true;
 }
 
 void SerialCommunication::sendSerialData(const RobotPosition & robotPos) {
   if (micros() - prevSerialTime >= SERIAL_PERIOD_MICROS) {
-    Serial.print(robotPos.X, 6); //X
+    Serial.print("P");
+    Serial.print(robotPos.pos.x, 6); //X
     Serial.print(",");
-    Serial.print(robotPos.Y, 6); //Y
+    Serial.print(robotPos.pos.y, 6); //Y
     Serial.print(",");
     Serial.print(float(robotPos.Phi)); //Phi
     Serial.print(",");
@@ -32,8 +34,8 @@ void SerialCommunication::receiveSerialData() {
       command[i] = tempString.toFloat();
       ++i;
     }
-    commandX = command[0];
-    commandY = command[1];
+    commandPos.x = command[0];
+    commandPos.y = command[1];
     commandPhi = command[2];
     updateStatus(false);
   }

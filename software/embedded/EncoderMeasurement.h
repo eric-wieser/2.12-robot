@@ -41,7 +41,7 @@ class EncoderMeasurement {
     void update();
 
   private:
-    Drive &drive;
+    const Drive &drive;
 
     uint32_t encoderRCount;    //encoder 1 counts in ticks for the current cycle
     uint32_t encoderLCount;   //encoder 2 counts in ticks for the current cycle

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Angle.h"
-
+#include "Vector.h"
 /*
 Class Name: RobotPosition
 Description: vehicle position and orientation calculator
@@ -17,8 +17,7 @@ External Variable Dependency: float dThetaL, float dThetaR from object of Encode
 */
 class RobotPosition {
   public:
-    float X;  //robot X position in meters
-    float Y;  //robot Y position in meters
+    Vector pos; // in meters
     Angle Phi; //robot global orientation in meters
     float pathDistance; //trajectory path distance in meters
     /*
