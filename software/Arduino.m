@@ -70,27 +70,36 @@ classdef Arduino < handle
 		end
 
 		function packet = decode_packet(~, serialData)
-			if serialData(1) == 'P'
-				% position update packet
-				serialData = serialData(2:end);
-				splitData = strsplit(serialData, ',');
-				if length(splitData) < 4
-					MException('arduino:decode:truncated', 'Packet too short').throw;
-				end
+			contents = serialData(2:end);
+			switch serialData(1)
+				case 'P'
+					% position update packet
+					splitData = strsplit(contents, ',');
+					if length(splitData) < 4
+						MException('arduino:decode:truncated', 'Packet too short').throw;
+					end
 
-				packet = struct();
-				packet.type = 'location';
-				packet.x = str2double(splitData(1));
-				packet.y = str2double(splitData(2));
-				packet.phi = str2double(splitData(3));
-				packet.status = str2double(splitData(4));
-				return
-			else
-				% unrecognized packet - assume debug
-				packet = struct();
-				packet.type = 'debug';
-				packet.message = serialData;
-				return;
+					packet = struct();
+					packet.type = 'location';
+					packet.x = str2double(splitData(1));
+					packet.y = str2double(splitData(2));
+					packet.phi = str2double(splitData(3));
+					packet.status = str2double(splitData(4));
+				case 'E'
+					% error packet
+					packet = struct();
+					packet.type = 'error';
+					packet.message = contents;
+				case 'D'
+					% debug packet
+					packet = struct();
+					packet.type = 'debug';
+					packet.message = contents;
+				otherwise
+					% unprefixed packet - assume debug
+					packet = struct();
+					packet.type = 'debug';
+					packet.message = serialData;
 			end
 		end
 
