@@ -2,18 +2,8 @@
 %Written by Fangzhou Xia, Michael, Melanie, and Daniel
 %Be sure to close the GUI before uploading the Arduino Code
 function navigation
-    %Change the points to get the ideal shape
-    command_X = [0.2, 0.4, 0.6, 0.8]; %unit in meters
-    command_Y = [0.2, 0.4, 0.6, 0.6]; %unit in meters
-    command_Phi = [45, 45, 0, 0]; %unit in degrees
-
-
-    %%% Don't Modify anything below this line for lab 3%%%
-    %  Construct automatic mode components
-    command_Index = 1; %pre-defined trajectory point index
-    command_update = 1; % flag for automatic serial write
     nextData = [0 0 0]; % used to hold variable in the 'Manual' mode
-    send_mode = 'Manual'; % mode can be 'Manual' or 'Automatic'
+	
     windowWidth = 1000; %WindowWidth is the number of location points to keep
     robotSize = 0.1651; %This is an actual-size robot, in meters
     %  Construct the GUI components.
@@ -32,7 +22,7 @@ function navigation
         'Position',[430,380,100,20]);
     f_mode = uicontrol(...
         'Style','popupmenu',...
-        'String',{'Manual','Automatic'},...
+        'String',{'Manual'},...
         'Position',[550,385,100,18],...
         'Callback',{@f_mode_menu_Callback});
     f_a = axes(...
@@ -139,54 +129,13 @@ function navigation
 
         plot(f_a, xPos, yPos, '.');
 
-        if (strcmp(send_mode, 'Automatic'))
-            plot(f_a,command_X, command_Y,'-');
-            plot(f_a,command_X, command_Y,'*');
-        elseif (strcmp(send_mode, 'Manual'))
-            hold on;
-            nextData = get(f_table,'Data');
-            plot(nextData(1), nextData(2),'*');
-        end
+        hold on;
+        nextData = get(f_table,'Data');
+        plot(nextData(1), nextData(2),'*');
 
         % Make the GUI visible.
         set(f,'Visible','on');
         drawnow
-
-        %Logic for handling 'Automatic' mode operation
-        if (strcmp(send_mode, 'Automatic'))
-            %display(command_Index)
-            if (newStatus ~= 0)
-                if (abs(command_X(command_Index) - newxPos) <= 0.15) && (abs(command_Y(command_Index) - newyPos) <= 0.15)
-                    %(abs(command_Phi(command_Index) - newAngle) <= 5) %Phi is not checked for lab 3
-                    if command_Index < length(command_X)
-                        command_Index = command_Index + 1;
-                        command_update = 1;
-                    else
-                        display('Reached end of pre-defined trajectory!');
-                        pause(5);
-                    end
-                else
-                    display(['Matlab position check failed with X_diff =',num2str(abs(command_X(command_Index) - newxPos)),...
-                        'm and Y_diff =',num2str(abs(command_X(command_Index) - newxPos))]);
-                    pause(1);
-                end
-            end
-            if (command_update ~= 0)
-                packet = struct();
-                packet.type = 'dest';
-                packet.x = command_X(command_Index);
-                packet.y = command_Y(command_Index);
-                packet.phi = pi/180*command_Phi(command_Index);
-
-                arduino.send_packet(packet);
-
-                pause(1); %pause for the serial communication
-                if command_update == 1
-                    command_update = 0;
-                end
-            end
-        end
-        %display(serialData); % for debug only
     end
 
     %Close the connection
@@ -198,22 +147,18 @@ function navigation
     %send button push handler function
     function f_send_button_Callback(source,eventdata)
         % Display surf plot of the currently selected data.
-        if strcmp(send_mode, 'Manual')
-            nextData = get(f_table,'Data');
-            packet = struct();
-            packet.type = 'dest';
-            packet.x = nextData(1);
-            packet.y = nextData(2);
-            packet.phi = pi/180*nextData(3);
-            arduino.send_packet(packet);
+		nextData = get(f_table,'Data');
+		packet = struct();
+		packet.type = 'dest';
+		packet.x = nextData(1);
+		packet.y = nextData(2);
+		packet.phi = pi/180*nextData(3);
+		arduino.send_packet(packet);
 
-            display(['Point command sent successfully with X = ',num2str(nextData(1)),...
-                'm, Y = ',num2str(nextData(2)),...
-                'm, Phi = ',num2str(nextData(3)),'deg']);
-            pause(1); %pause for the serial communication
-        else
-            display('Please switch to manual mode');
-        end
+		display(['Point command sent successfully with X = ',num2str(nextData(1)),...
+			'm, Y = ',num2str(nextData(2)),...
+			'm, Phi = ',num2str(nextData(3)),'deg']);
+		pause(1);
         %surf(current_data);
     end
 
@@ -224,14 +169,5 @@ function navigation
         % Set current data to the selected data set.
         send_mode = str{val};
         display(send_mode);
-        if strcmp(send_mode,'Automatic')
-            packet = struct();
-            packet.type = 'dest';
-            packet.x = command_X(command_Index);
-            packet.y = command_Y(command_Index);
-            packet.phi = pi/180*command_Phi(command_Index);
-
-            arduino.send_packet(packet);
-        end
     end
 end
