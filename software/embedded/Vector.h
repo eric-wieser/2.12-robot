@@ -32,5 +32,7 @@ public:
 	inline Vector rotCCW() {
 		return Vector(-y, x);
 	}
+	static inline Vector inDirection(Angle a, float l=1) {
+		return Vector(cos(a)*l, sin(a)*l);
+	}
 };
-
