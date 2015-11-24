@@ -1,6 +1,8 @@
 classdef Arduino < handle
 	properties
 		conn
+		incompleteLine
+		unparsedPackets
 	end
 	methods
 		function obj = Arduino(comPort)
@@ -14,6 +16,9 @@ classdef Arduino < handle
 
 			% Throw away the startup gibberish
 			flushinput(obj.conn);
+
+			obj.incompleteLine = '';
+			obj.unparsedPackets = {};
 		end
 		function send_packet(obj, packet)
 			% send a packet to the arduino
@@ -35,15 +40,36 @@ classdef Arduino < handle
 			% recieve a packet from the arduino. If there is no pending packet
 			% then return [], which can be tested for with isempty
 
-			% this is a temporary hack copied from lab3
-			if (obj.conn.BytesAvailable < 12)
+			available = obj.conn.BytesAvailable;
+			if available > 0
+				% read the buffered port contents, and concatenate it with whatever was left last time
+				data = [obj.incompleteLine fread(obj.conn, available)'];
+				
+				% split into lines - Serial.println sends \r\n
+				parts = strsplit(data, '\r\n');
+				
+				% the last line is incomplete
+				obj.incompleteLine = parts{end};
+				
+				% if we completed any lines, add them to the end of our queue
+				obj.unparsedPackets = [obj.unparsedPackets parts(1:end-1)];
+			end
+
+			% if the queue is empty, we have no packet to return
+			if isempty(obj.unparsedPackets)
 				packet = [];
 				return
 			end
 
-			% Get a line from the buffer
-			serialData = fscanf(obj.conn, '%s');
+			% otherwise, pop the queue
+			serialData = obj.unparsedPackets{1};
+			obj.unparsedPackets = obj.unparsedPackets(2:end);
 
+			% and decode
+			packet = obj.decode_packet(serialData);
+		end
+
+		function packet = decode_packet(~, serialData)
 			if serialData(1) == 'P'
 				% position update packet
 				serialData = serialData(2:end);
@@ -66,7 +92,6 @@ classdef Arduino < handle
 				packet.message = serialData;
 				return;
 			end
-
 		end
 
 		function delete(obj)
