@@ -7,7 +7,7 @@
 
 //PathPlanner Class function implementation
 PathPlanner::PathPlanner() {
-  currentTask = 1;
+  currentTask = 0;
   desiredMVL = 0;
   desiredMVR = 0;
   phiGoal = 0;
