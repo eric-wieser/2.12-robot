@@ -25,6 +25,15 @@ void SerialCommunication::sendSerialData(const RobotPosition & robotPos) {
 void SerialCommunication::receiveSerialData() {
   if (Serial.available() > 0) {
     commandString = Serial.readString();
+    char type = commandString[0];
+    commandString = commandString.substring(1);
+
+    if(type != 'D') {
+      Serial.print("Unimplemented command type '");
+      Serial.print(type);
+      Serial.println("'");
+      return;
+    }
     int i = 0;
     indexPointer = 0;
     while (indexPointer != -1 ) {

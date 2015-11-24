@@ -25,11 +25,26 @@ classdef Arduino < handle
 
 			switch packet.type
 				case 'dest'
+					fwrite(obj.conn, 'D');
 					fwrite(obj.conn, num2str(packet.x));
 					fwrite(obj.conn, ',');
 					fwrite(obj.conn, num2str(packet.y));
 					fwrite(obj.conn, ',');
 					fwrite(obj.conn, num2str(packet.phi));
+					fwrite(obj.conn, '\n');
+				case 'gps'
+					fwrite(obj.conn, 'G');
+					fwrite(obj.conn, num2str(packet.x));
+					fwrite(obj.conn, ',');
+					fwrite(obj.conn, num2str(packet.y));
+					fwrite(obj.conn, ',');
+					fwrite(obj.conn, num2str(packet.phi));
+					fwrite(obj.conn, ',');
+					fwrite(obj.conn, num2str(packet.timestamp));
+					fwrite(obj.conn, '\n');
+				case 'servo'
+					fwrite(obj.conn, 'S');
+					fwrite(obj.conn, num2str(packet.target));
 					fwrite(obj.conn, '\n');
 				otherwise
 					MException('arduino:encode:unkn', 'Unknown packet type').throw;
