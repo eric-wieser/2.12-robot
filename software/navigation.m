@@ -49,32 +49,21 @@ function navigation
 
     %Try starting a serial connection with the Arduino
     try
-        serialConnection = serial('COM4');  %Use Arduino IDE to see which com port the Arduino UNO is using
-        set(serialConnection, 'BaudRate', 115200); %Set the baud rate on the computer and Arduino to be the same
-        fopen(serialConnection); %Try opening the serial connection
-        display('Successfully connected to Arduino over Serial!');
-        pause(1); %Wait for the Arduino to resete
-        flushinput(serialConnection);  %Throw away the startup gibberish
-    %If connecting over Serial throws an error, this catch section will run
-    catch
-        %Tell the user that Serial did not work
-        display('Serial connection could not be established. Make sure the Arduino is plugged in and on the right port (check in Arduino IDE).');
-        return; %Quit the program
+        arduino = Arduino('COM4');  % Use Arduino IDE to see which com port the Arduino UNO is using
+    catch e
+        switch e.identifier
+			case 'MATLAB:serial:fopen:opfailed'
+				display('Serial connection could not be established. Make sure the Arduino is plugged in and on the right port (check in Arduino IDE).');
+				return; %Quit the program
+			otherwise
+				rethrow(e)
+		end
     end
 
-    c = onCleanup(@() fclose(serialConnection));
+    c = onCleanup(@() delete(arduino));
     %Create blank vectors for the incoming serial data
     xPos = linspace(0, 0, windowWidth*3);
     yPos = linspace(0, 0, windowWidth*3);
-
-    %Flush the serial buffer before starting the infinite loop
-    flushinput(serialConnection);
-    %Read and discard any incomplete line
-    incompleteRead = fscanf(serialConnection, '%s');
-    %Initialize serialData
-    serialData = '';
-
-    while (serialConnection.BytesAvailable < 12); end;
 
     %Run the graphing window forever, until someone hits X on the graph
     while true
@@ -83,34 +72,44 @@ function navigation
             break;
         end
         %Try reading new serial data
-        try
-            %Keep reading and processing until the buffer is almost empty
-            while (serialConnection.BytesAvailable > 12)
-                %Get a line of format: actual,desired\n from the Serial buffer
-                serialData = fscanf(serialConnection, '%s');
-    			if serialData(1) ~= 'P'
-    				display(['Debug: ' serialData]);
-    				continue;
-    			end
-    			serialData = serialData(2:end);
-                %Break the line into actual and desired
-                splitData = strsplit(serialData, ',');
-                %Get actual and desired data as numbers instead of strings
-                newxPos = str2double(splitData(1));
-                newyPos = str2double(splitData(2));
-                newAngle = (180/pi)*str2double(splitData(3));
-                newStatus = str2double(splitData(4));
-                %Drop the first elements of the data vectors
-                xPos(1) = [];
-                yPos(1) = [];
-                %Append the new values to the _mdata vectors
-                xPos = [xPos newxPos];
-                yPos = [yPos newyPos];
-    		end
-        catch
-            display(['Bad Serial Data: ' serialData]);
-    		continue;
-        end
+
+        %Keep reading and processing until the buffer is almost empty
+        any_packet = false;
+        while true
+            % keep reading packets until we've had at least one, and there are no more
+            try
+                packet = arduino.recv_packet();
+            catch e
+                disp(['Packet error' e.message]);
+				continue
+            end
+            if isempty(packet)
+                if any_packet
+                    break
+                else
+                    continue
+                end
+            end
+            % do something with the packet
+			switch packet.type
+				case 'debug'
+					display(['Debug: ' packet.message]);
+				case 'location'
+					newxPos = packet.x;
+					newyPos = packet.y;
+					newAngle = (180/pi)*packet.phi;
+					newStatus = packet.status;
+					%Drop the first elements of the data vectors
+					xPos(1) = [];
+					yPos(1) = [];
+					%Append the new values to the _mdata vectors
+					xPos = [xPos newxPos];
+					yPos = [yPos newyPos];
+					
+					any_packet = true;
+            end
+		end
+
         %Draw the robot at the latest x,y location
         switch newStatus
             case 1
@@ -174,7 +173,7 @@ function navigation
                 packet.y = command_Y(command_Index);
                 packet.phi = pi/180*command_Phi(command_Index);
 
-                send_packet(packet);
+                arduino.send_packet(packet);
 
                 pause(1); %pause for the serial communication
                 if command_update == 1
@@ -185,24 +184,11 @@ function navigation
         %display(serialData); % for debug only
     end
 
-    %Close the serial connection
-    fclose(serialConnection);
-    delete(serialConnection);
+    %Close the connection
+    delete(arduino);
+
     %clear serialConnection;
     display('Serial Connection gracefully closed!');
-
-    function send_packet(packet)
-        if packet.type == 'dest'
-            fwrite(serialConnection,num2str(packet.x));
-            fwrite(serialConnection,',');
-            fwrite(serialConnection,num2str(packet.y));
-            fwrite(serialConnection,',');
-            fwrite(serialConnection,num2str(packet.phi));
-            fwrite(serialConnection,'\n');
-        else
-            error('Unknown packet type')
-        end
-    end
 
     %send button push handler function
     function f_send_button_Callback(source,eventdata)
@@ -214,7 +200,7 @@ function navigation
             packet.x = nextData(1);
             packet.y = nextData(2);
             packet.phi = pi/180*nextData(3);
-            send_packet(packet);
+            arduino.send_packet(packet);
 
             display(['Point command sent successfully with X = ',num2str(nextData(1)),...
                 'm, Y = ',num2str(nextData(2)),...
@@ -234,13 +220,13 @@ function navigation
         send_mode = str{val};
         display(send_mode);
         if strcmp(send_mode,'Automatic')
-            fwrite(serialConnection,num2str(command_X(command_Index)));
-            fwrite(serialConnection,',');
-            fwrite(serialConnection,num2str(command_Y(command_Index)));
-            fwrite(serialConnection,',');
-            fwrite(serialConnection,num2str(pi/180*command_Phi(command_Index)));
-            fwrite(serialConnection,'\n');
-            pause(1); %pause for the serial communication
+            packet = struct();
+            packet.type = 'dest';
+            packet.x = command_X(command_Index);
+            packet.y = command_Y(command_Index);
+            packet.phi = pi/180*command_Phi(command_Index);
+
+            arduino.send_packet(packet);
         end
     end
 end
