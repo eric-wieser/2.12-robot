@@ -79,7 +79,11 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
     if (!reportData.finished){
       currentTask = 1;
       turnBegin = robotPos.Phi;
-      turnEnd = (reportData.commandPos - robotPos.pos).angle();
+      Vector dist = reportData.commandPos - robotPos.pos;
+
+      // skip small movements
+      if(dist.magnitudeSq() < 0.025*0.025) currentTask = 3;
+      turnEnd = dist.angle();
     }
   }
 
