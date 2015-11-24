@@ -107,14 +107,17 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
       desiredMVR = 0.2;
       desiredMVL = 0.2;
       bool done = OrientationController(robotPos, reportData);
-      if(done) reportData.updateStatus(true);
-    } else { //if we are there, stop and move on to the next task
-      desiredMVR = 0;
-      desiredMVL = 0;
-      currentTask = 0;
-      lastRobotPos = robotPos;
-      Serial.println("NEXT POINT");
-      reportData.updateStatus(true);
+      if(done) currentTask = 3;
+    } else {
+      currentTask = 3;
     }
+  }
+  if (currentTask == 3) { //done
+    desiredMVR = 0;
+    desiredMVL = 0;
+    currentTask = 0;
+    lastRobotPos = robotPos;
+    Serial.println("NEXT POINT");
+    reportData.updateStatus(true);
   }
 }
