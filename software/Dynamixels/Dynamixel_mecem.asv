@@ -1,0 +1,65 @@
+function Dynamixel_mecem 
+%% Initializations
+% initialize the object for interfacing with the dynamixels
+d = Dynamixels(2);
+port = 7;
+kbps = 4;
+d.Connect(port, kbps);
+
+onCleanup(@()[
+disp('harm avoided')...
+d.SetGoalPos(1,d.GetCurrentPos(1))...
+d.SetGoalPos(2,d.GetCurrentPos(2))...
+d.Disconnect()]);
+
+    function doCleanup
+        
+% set limits
+d.SetTorque(1,111);
+d.SetTorque(2,111);
+% d.SetBounds(1,,);
+% d.SetBounds(2,,);
+d.SetSpeed(1,1300);
+d.SetSpeed(2,1300);
+
+% go to initial configuration
+% init_pos1 = -500;
+% init_pos2 = 4000;
+d.SetGoalPos(1,0);
+d.SetGoalPos(2,0);
+
+%% Move dynamixel
+    pos = 2000; %pos positive to the up
+    d.SetGoalPos(1,pos);
+    d.GetCurrentPos(1)
+    d.SetGoalPos(2,pos);
+    d.GetCurrentPos(2)
+
+% d.SetGoalPos(1,Dynamixels.rad2value(0));
+% d.GetCurrentPos(1)
+% d.SetGoalPos(2,Dynamixels.rad2value(0));
+% d.GetCurrentPos(2)
+%if ak.inWorkspace(x,y)
+%    [theta1, theta2] = ak.findThetas(x,y);
+%    d.SetGoalPos(1,Dynamixels.rad2value(theta1));
+%    d.SetGoalPos(2,Dynamixels.rad2value(theta2));
+%else
+%    disp('Point is outside of the workspace of the arm.');
+%end
+
+% f = 0.5*2*pi;
+% a = 5;
+% tic;
+% while toc < 20
+%     x = a*cos(f*toc);
+%     y = 30 + a*sin(f*toc);
+%     if ak.inWorkspace(x,y)
+%         [theta1, theta2] = ak.findThetas(x,y);
+%         d.SetGoalPos(1,Dynamixels.rad2value(theta1));
+%         d.SetGoalPos(2,Dynamixels.rad2value(theta2));
+%     end
+% end
+
+%% Disconnect
+d.Disconnect();
+end

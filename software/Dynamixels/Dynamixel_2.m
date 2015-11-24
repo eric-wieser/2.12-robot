@@ -5,13 +5,13 @@
 %
 % This class represents a set of Dynamixel servos connected to the computer
 
-classdef Dynamixels
+classdef Dynamixel
     properties
         % the number of servos on the bus
         nServos
     end
     methods
-        function obj = Dynamixels(nServos)
+        function obj = Dynamixel(nServos)
             if nargin > 0
                 if isnumeric(nServos)
                     obj.nServos = nServos;
@@ -38,55 +38,39 @@ classdef Dynamixels
                 disp('Failed to open USB2Dynamixel! Is the dongle connected, is the port correct, and is the dynamixel library installed?');
             end
         end
-        
+
         % set the position of a single servo -- range 0 to 4095, centered
-        % at 2047
+        % at 2047 % note that on some of your robots, they may have
+        % slightly altred mounting such that the center of teh link arm and
+        % the center the rotational position
         function SetGoalPos(obj, id, Pos)
-            % this is the Register on the Servo that corresponds to the
-            % goal pos (positive to the up)
+            % this is the Register on the Servo that corresponds to the goal pos
             P_GOAL_POSITION = 30;
             % write it
-                init_pos1 = 500;
-                init_pos2 = 2500;
-%             init_pos1 = -500;
-%             init_pos2 = 4000;
-            if (id == 1)
-                calllib('dynamixel','dxl_write_word',id,P_GOAL_POSITION,Pos+init_pos1);
-            else
-                calllib('dynamixel','dxl_write_word',id,P_GOAL_POSITION,-Pos+init_pos2);  %attention servo do not turn in same direction
-            end
+            calllib('dynamixel','dxl_write_word',id,P_GOAL_POSITION, Pos);
         end
-        
-        function SetAngle(obj, id, addr, ang)
-            value = obj.rad2value(ang);
-            calllib('dynamixel', 'dxl_write_word', id, addr, value);
-        end        
-        
-        function SetBounds(obj, id, min, max)
-            SetAngle(obj, id, 6, min);
-            SetAngle(obj, id, 8, max);
-        end
-        
-       function SetTorque(obj, id, torque_limit)
-            calllib('dynamixel', 'dxl_write_word', id, 14, torque_limit);
-       end
-        
-       function SetSpeed(obj, id, speed)
-            calllib('dynamixel', 'dxl_write_word', id, 32, speed);
-       end
-       
-       function Pos = GetCurrentPos(obj, id)
+
+        function Pos = GetCurrentPos(obj, id)
             % this is the Register on the Servo that corresponds to the current pos
             P_CURRENT_POSITION = 36;
             % read it
             Pos = calllib('dynamixel','dxl_read_word',id,P_CURRENT_POSITION);
         end
-        
+
+        function SetAngle(obj, id, addr, ang)
+            value = obj.rad2value(ang);
+            calllib('dynamixel', 'dxl_write_word', id, addr, value);
+        end
+        function SetBounds(obj, id, min, max)
+            SetAngle(obj, id, 6, min);
+            SetAngle(obj, id, 8, max);
+        end
         function Disconnect(obj)
+            %it's very imoprtant to terminate and unload
             calllib('dynamixel','dxl_terminate');
             unloadlibrary('dynamixel');
         end
-        
+
     end
     methods (Static)
         % convert angle in radians to angle in Dynamixel values (0-4095)
