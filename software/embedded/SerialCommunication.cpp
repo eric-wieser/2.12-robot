@@ -28,14 +28,8 @@ void SerialCommunication::receiveSerialData() {
     char type = commandString[0];
     commandString = commandString.substring(1);
 
-    if(type != 'D') {
-      Serial.print("Unimplemented command type '");
-      Serial.print(type);
-      Serial.println("'");
-      return;
-    }
     int i = 0;
-    indexPointer = 0;
+    int indexPointer = 0;
     while (indexPointer != -1 ) {
       indexPointer = commandString.indexOf(',');
       tempString = commandString.substring(0, indexPointer);
@@ -43,10 +37,26 @@ void SerialCommunication::receiveSerialData() {
       command[i] = tempString.toFloat();
       ++i;
     }
-    commandPos.x = command[0];
-    commandPos.y = command[1];
-    commandPhi = command[2];
-    updateStatus(false);
+
+
+    if(type == 'D') {
+      commandPos.x = command[0];
+      commandPos.y = command[1];
+      commandPhi = command[2];
+      updateStatus(false);
+    }
+    else if(type == 'G') {
+      gpsData.pos.x = command[0];
+      gpsData.pos.y = command[1];
+      gpsData.phi = command[2];
+      gpsData.received = micros(); // TODO: use the gps timestamp?
+    }
+    else {
+      Serial.print("Unimplemented command type '");
+      Serial.print(type);
+      Serial.println("'");
+      return;
+    }
   }
 }
 

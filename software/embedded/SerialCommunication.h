@@ -29,6 +29,15 @@ class SerialCommunication {
     Vector commandPos;
     float commandPhi;
     bool finished;
+
+    struct GPSReport {
+        Vector pos;
+        Angle phi;
+        uint32_t received;
+    };
+
+    GPSReport gpsData;
+
     SerialCommunication();
     /*Function Name: sendSerialData(const RobotPosition & robotPos);
     Effect: report serial data to matlab
@@ -66,5 +75,4 @@ class SerialCommunication {
     unsigned long prevSerialTime;
     String commandString;
     String tempString;
-    int indexPointer = 0;
 };
