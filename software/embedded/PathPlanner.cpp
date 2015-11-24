@@ -71,11 +71,6 @@ bool PathPlanner::OrientationController(const RobotPosition & robotPos, SerialCo
 
 void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication & reportData) {
   //take next point (X,Y) positions given by MatLab, calculate phi to turn towards, then go straight
-  Angle phiGoal = (reportData.commandPos - lastRobotPos.pos).angle();
-  // constrain the error in phi to the [-pi, pi)
-  float lastPhiError = phiGoal - Angle(lastRobotPos.Phi);
-  float currentPhiError = phiGoal - Angle(robotPos.Phi);
-  Vector dpos = reportData.commandPos - robotPos.pos;
 
   if (currentTask == 0) { // waiting to receive command x,y
     desiredMVR = 0;
@@ -86,6 +81,12 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
   }
 
   if (currentTask == 1) { //turn towards next point
+    Angle phiGoal = (reportData.commandPos - lastRobotPos.pos).angle();
+
+    float lastPhiError = phiGoal - Angle(lastRobotPos.Phi);
+    float currentPhiError = phiGoal - Angle(robotPos.Phi);
+    Vector dpos = reportData.commandPos - robotPos.pos;
+
     //turn counter clock wise
     if (lastPhiError > 0 && currentPhiError > 0) {
       desiredMVR = 0.2;
