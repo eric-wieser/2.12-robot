@@ -17,6 +17,7 @@ classdef Arduino < handle
 		end
 		function send_packet(obj, packet)
 			% send a packet to the arduino
+
 			switch packet.type
 				case 'dest'
 					fwrite(obj.conn, num2str(packet.x));
@@ -31,6 +32,9 @@ classdef Arduino < handle
 		end
 
 		function packet = recv_packet(obj)
+			% recieve a packet from the arduino. If there is no pending packet
+			% then return [], which can be tested for with isempty
+
 			% this is a temporary hack copied from lab3
 			if (obj.conn.BytesAvailable < 12)
 				packet = [];
@@ -66,6 +70,8 @@ classdef Arduino < handle
 		end
 
 		function delete(obj)
+			% close the serial connection
+
 			try
 				fclose(obj.conn);
 			catch; end
