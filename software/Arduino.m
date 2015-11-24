@@ -46,6 +46,9 @@ classdef Arduino < handle
 					fwrite(obj.conn, 'S');
 					fwrite(obj.conn, num2str(packet.target));
 					fwrite(obj.conn, '\n');
+				case 'kill'
+					fwrite(obj.conn, 'K');
+					fwrite(obj.conn, '\n');
 				otherwise
 					MException('arduino:encode:unkn', 'Unknown packet type').throw;
 			end
@@ -120,11 +123,10 @@ classdef Arduino < handle
 
 		function delete(obj)
 			% close the serial connection
-
-			try
-				fclose(obj.conn);
-			catch; end
-			delete(obj.conn)
+			disp('Stopping motors');
+			obj.send_packet(struct('type', 'kill'));
+			fclose(obj.conn);
+			delete(obj.conn);
 		end
 	end
 end

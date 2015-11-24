@@ -51,6 +51,12 @@ void SerialCommunication::receiveSerialData() {
       gpsData.phi = command[2];
       gpsData.received = micros(); // TODO: use the gps timestamp?
     }
+    else if (type == 'S') {
+      servoGoal = command[0];
+    }
+    else if (type == 'K') {
+      killRequested = true;
+    }
     else {
       Serial.print("Unimplemented command type '");
       Serial.print(type);

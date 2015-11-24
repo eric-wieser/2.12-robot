@@ -38,6 +38,10 @@ class SerialCommunication {
 
     GPSReport gpsData;
 
+    float servoGoal;
+
+    bool killRequested = false;
+
     SerialCommunication();
     /*Function Name: sendSerialData(const RobotPosition & robotPos);
     Effect: report serial data to matlab

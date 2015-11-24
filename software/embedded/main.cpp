@@ -19,6 +19,7 @@ Main::Main() : measureRobot(drive), moveRobot(drive) {
 }
 
 void Main::loop() {
+
   //timed loop implementation
   uint32_t currentTime = micros();
   if (currentTime - prevTime >= PERIOD_MICROS) {
@@ -47,6 +48,14 @@ void Main::loop() {
     moveRobot.controlMR(pathPlanner.desiredMVR, measureRobot.mVR); // right motor PI control
     moveRobot.controlML(pathPlanner.desiredMVL, measureRobot.mVL); //left motor PI control
     prevTime = currentTime; //update timer
+
+    if(reportData.killRequested) {
+      drive.setMRSpeed(0);
+      drive.setMLSpeed(0);
+      Serial.println("Killed by master");
+
+      while(1);
+    }
   }
 }
 
