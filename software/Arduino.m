@@ -56,7 +56,7 @@ classdef Arduino < handle
 				packet.type = 'location';
 				packet.x = str2double(splitData(1));
 				packet.y = str2double(splitData(2));
-				packet.phi = (180/pi)*str2double(splitData(3));
+				packet.phi = str2double(splitData(3));
 				packet.status = str2double(splitData(4));
 				return
 			else
