@@ -168,12 +168,14 @@ function navigation
                 end
             end
             if (command_update ~= 0)
-                fwrite(serialConnection,num2str(command_X(command_Index)));
-                fwrite(serialConnection,',');
-                fwrite(serialConnection,num2str(command_Y(command_Index)));
-                fwrite(serialConnection,',');
-                fwrite(serialConnection,num2str(pi/180*command_Phi(command_Index)));
-                fwrite(serialConnection,'\n');
+                packet = struct();
+                packet.type = 'dest';
+                packet.x = command_X(command_Index);
+                packet.y = command_Y(command_Index);
+                packet.phi = pi/180*command_Phi(command_Index);
+
+                send_packet(packet);
+
                 pause(1); %pause for the serial communication
                 if command_update == 1
                     command_update = 0;
@@ -189,17 +191,31 @@ function navigation
     %clear serialConnection;
     display('Serial Connection gracefully closed!');
 
+    function send_packet(packet)
+        if packet.type == 'dest'
+            fwrite(serialConnection,num2str(packet.x));
+            fwrite(serialConnection,',');
+            fwrite(serialConnection,num2str(packet.y));
+            fwrite(serialConnection,',');
+            fwrite(serialConnection,num2str(packet.phi));
+            fwrite(serialConnection,'\n');
+        else
+            error('Unknown packet type')
+        end
+    end
+
     %send button push handler function
     function f_send_button_Callback(source,eventdata)
         % Display surf plot of the currently selected data.
         if strcmp(send_mode, 'Manual')
             nextData = get(f_table,'Data');
-            fwrite(serialConnection,num2str(nextData(1)));
-            fwrite(serialConnection,',');
-            fwrite(serialConnection,num2str(nextData(2)));
-            fwrite(serialConnection,',');
-            fwrite(serialConnection,num2str(pi/180*nextData(3)));
-            fwrite(serialConnection,'\n');
+            packet = struct();
+            packet.type = 'dest';
+            packet.x = nextData(1);
+            packet.y = nextData(2);
+            packet.phi = pi/180*nextData(3);
+            send_packet(packet);
+
             display(['Point command sent successfully with X = ',num2str(nextData(1)),...
                 'm, Y = ',num2str(nextData(2)),...
                 'm, Phi = ',num2str(nextData(3)),'deg']);
