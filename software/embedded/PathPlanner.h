@@ -2,6 +2,7 @@
 
 #include "Angle.h"
 #include "Vector.h"
+#include "Spline.h"
 
 #include "RobotPosition.h"
 class SerialCommunication;
@@ -26,6 +27,10 @@ class PathPlanner {
     Angle phiGoal;
     float pathGoal;
     RobotPosition lastRobotPos;
+
+    Spline turnSpline = Spline(0, 1, 0.2, 0.2);
+    Angle turnBegin;
+    Angle turnEnd;
 
     PathPlanner();
     /*Function Name: void LabTestRun(const RobotPosition &robotPos);

@@ -34,7 +34,3 @@ public:
 	}
 };
 
-template<typename T>
-T lerp(T a, T b, float p) {
-	return a*(1-p) + b*p;
-}

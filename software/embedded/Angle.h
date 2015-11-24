@@ -40,3 +40,11 @@ public:
 	friend inline float sin(Angle a) { return sinf(a._value); }
 	friend inline float tan(Angle a) { return tanf(a._value); }
 };
+
+
+// when unlerping angles, we want the discontinuity far from the ends
+inline float unlerp(Angle a, Angle b, Angle lerped) {
+	float span = b - a;
+	Angle center = a + span/2;
+	return 0.5 + (lerped - center) / span;
+}

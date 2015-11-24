@@ -4,6 +4,7 @@
 #include "constants.h"
 #include "RobotPosition.h"
 #include "SerialCommunication.h"
+#include "util.h"
 
 //PathPlanner Class function implementation
 PathPlanner::PathPlanner() {
@@ -77,42 +78,38 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
     desiredMVL = 0;
     if (!reportData.finished){
       currentTask = 1;
+      turnBegin = robotPos.Phi;
+      turnEnd = (reportData.commandPos - robotPos.pos).angle();
     }
   }
 
   if (currentTask == 1) { //turn towards next point
-    Angle phiGoal = (reportData.commandPos - lastRobotPos.pos).angle();
 
-    float lastPhiError = phiGoal - Angle(lastRobotPos.Phi);
-    float currentPhiError = phiGoal - Angle(robotPos.Phi);
-    Vector dpos = reportData.commandPos - robotPos.pos;
+    // interpolate our motor speeds quadratically in angle
+    float through_turn = unlerp(turnBegin, turnEnd, robotPos.Phi);
+    float speed = sgn(turnEnd  - turnBegin) * turnSpline.eval_dp(through_turn);
 
-    //turn counter clock wise
-    if (lastPhiError > 0 && currentPhiError > 0) {
-      desiredMVR = 0.2;
-      desiredMVL = -0.2;
-    }
-    // turn clockwise
-    else if (lastPhiError < 0 && currentPhiError < 0) {
-      desiredMVR = -0.2;
-      desiredMVL = 0.2;
-    }
+    desiredMVR = speed;
+    desiredMVL = -speed;
+
     // move on
-    else {
+    if(through_turn >= 1 || turnBegin == turnEnd) {
       desiredMVR = 0;
       desiredMVL = 0;
       currentTask = 2;
-      pathGoal = robotPos.pathDistance + dpos.magnitude();
+      pathGoal = robotPos.pathDistance + (reportData.commandPos - robotPos.pos).magnitude();
     }
   }
 
   if (currentTask == 2) { //now go straight to next point
     if (robotPos.pathDistance < pathGoal) { //if we aren't there yet, keep going
-      computeDesiredV(.2, 0);
+      desiredMVR = 0.2;
+      desiredMVL = 0.2;
       bool done = OrientationController(robotPos, reportData);
       if(done) reportData.updateStatus(true);
     } else { //if we are there, stop and move on to the next task
-      computeDesiredV(0, 0);
+      desiredMVR = 0;
+      desiredMVL = 0;
       currentTask = 0;
       lastRobotPos = robotPos;
       Serial.println("NEXT POINT");
