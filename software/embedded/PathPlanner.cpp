@@ -107,9 +107,19 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
   }
 
   if (currentTask == 2) { //now go straight to next point
-    if (robotPos.pathDistance < pathGoal) { //if we aren't there yet, keep going
-      desiredMVR = 0.2;
-      desiredMVL = 0.2;
+    float speed = 0.4;
+
+    // slow down near the goal
+    const float slow_within = 0.2;
+    const float slow_to = 0.15;
+    float to_go = pathGoal - robotPos.pathDistance;
+    if (to_go < slow_within)
+      speed = lerp(slow_to, speed, to_go / slow_within);
+
+    if (to_go > 0) {
+      //if we aren't there yet, keep going
+      desiredMVR = speed;
+      desiredMVL = speed;
       bool done = OrientationController(robotPos, reportData);
       if(done) currentTask = 3;
     } else {
