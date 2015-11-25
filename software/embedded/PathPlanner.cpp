@@ -8,42 +8,9 @@
 
 //PathPlanner Class function implementation
 PathPlanner::PathPlanner() {
-  currentTask = 0;
+  currentTask = Task::IDLE;
   desiredMVL = 0;
   desiredMVR = 0;
-  phiGoal = 0;
-}
-
-void PathPlanner::LabTestRun(const RobotPosition & robotPos) {
-  if (currentTask == 1) { //we are moving forward
-    if (robotPos.pathDistance < 1.0) { //if we aren't there yet, keep going
-      computeDesiredV(.2, 0);
-
-    } else { //if we are there, stop, reset distances, and move on to the next task
-      desiredMVR = 0;
-      desiredMVL = 0;
-      currentTask = 2;
-    }
-  }
-  if (currentTask == 2) { //we are turning around
-    if (robotPos.pathDistance < 1.0 + (PI * .25)) { //if we aren't there yet, keep going
-      computeDesiredV(.1, 4);
-    } else { //if we are there, stop and move on to the next task
-      desiredMVR = 0;
-      desiredMVL = 0;
-      currentTask = 3;
-    }
-  }
-  if (currentTask == 3) { //we are going back home
-    if (robotPos.pathDistance < 2.0 + (PI * .25) ) { //if we aren't there yet, keep going
-      computeDesiredV(.2, 0);
-    } else { //if we are there, stop and move on to the next task
-      desiredMVR = 0;
-      desiredMVL = 0;
-      currentTask = 4;
-      Serial.println("DONE MOVING");
-    }
-  }
 }
 
 void PathPlanner::computeDesiredV(float forwardVel, float K) {
@@ -52,7 +19,7 @@ void PathPlanner::computeDesiredV(float forwardVel, float K) {
   desiredMVL = forwardVel * (1 - K * b);
 }
 
-bool PathPlanner::OrientationController(const RobotPosition & robotPos, SerialCommunication & reportData) {
+bool PathPlanner::OrientationController(const RobotPosition & robotPos, const SerialCommunication & reportData) {
   const float eps = .01;
   float KPhi = .50;
 
@@ -73,21 +40,21 @@ bool PathPlanner::OrientationController(const RobotPosition & robotPos, SerialCo
 void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication & reportData) {
   //take next point (X,Y) positions given by MatLab, calculate phi to turn towards, then go straight
 
-  if (currentTask == 0) { // waiting to receive command x,y
+  if (currentTask == Task::IDLE) { // waiting to receive command x,y
     desiredMVR = 0;
     desiredMVL = 0;
     if (!reportData.finished){
-      currentTask = 1;
+      currentTask = Task::TURN;
       turnBegin = robotPos.Phi;
       Vector dist = reportData.commandPos - robotPos.pos;
 
       // skip small movements
-      if(dist.magnitudeSq() < 0.025*0.025) currentTask = 3;
+      if(dist.magnitudeSq() < 0.025*0.025) currentTask = Task::DONE;
       turnEnd = dist.angle();
     }
   }
 
-  if (currentTask == 1) { //turn towards next point
+  if (currentTask == Task::TURN) { //turn towards next point
     static const Spline turnSpline(0, 1, 0.3, 0.1);
 
     // interpolate our motor speeds quadratically in angle
@@ -101,12 +68,12 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
     if(through_turn >= 1 || turnBegin == turnEnd) {
       desiredMVR = 0;
       desiredMVL = 0;
-      currentTask = 2;
+      currentTask = Task::STRAIGHT;
       pathGoal = robotPos.pathDistance + (reportData.commandPos - robotPos.pos).magnitude();
     }
   }
 
-  if (currentTask == 2) { //now go straight to next point
+  if (currentTask == Task::STRAIGHT) { //now go straight to next point
     float speed = 0.4;
 
     // slow down near the goal
@@ -121,15 +88,15 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
       desiredMVR = speed;
       desiredMVL = speed;
       bool done = OrientationController(robotPos, reportData);
-      if(done) currentTask = 3;
+      if(done) currentTask = Task::DONE;
     } else {
-      currentTask = 3;
+      currentTask = Task::DONE;
     }
   }
-  if (currentTask == 3) { //done
+  if (currentTask == Task::DONE) { //done
     desiredMVR = 0;
     desiredMVL = 0;
-    currentTask = 0;
+    currentTask = Task::IDLE;
     lastRobotPos = robotPos;
     Serial.println("NEXT POINT");
     reportData.updateStatus(true);

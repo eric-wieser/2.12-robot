@@ -21,68 +21,43 @@ External Variable Dependency:
 */
 class PathPlanner {
   public:
-    int currentTask;
+    enum class Task {
+        IDLE,
+        TURN,
+        STRAIGHT,
+        DONE
+    };
+    Task currentTask;
+
     float desiredMVL;
     float desiredMVR;
-    Angle phiGoal;
-    float pathGoal;
-    RobotPosition lastRobotPos;
-
-    Angle turnBegin;
-    Angle turnEnd;
-
     PathPlanner();
-    /*Function Name: void LabTestRun(const RobotPosition &robotPos);
-    Effect: modify the member variable desiredMVL and desiredMVR based on the K and forwardVel member variable and trajectory logic
-    Modifies: int currentTask;
 
-    Requirement: None
-    Input: None
-    Output: None
-    Usage; Call this function in each timed loop to update the desired wheel velocity
-    */
-    void LabTestRun(const RobotPosition &robotPos);
-    /*Function Name: void computeDesiredV();
-    Effect: compute desiredMVL and desiredMVR based on the K and forwardVel member variable
-    Modifies:
-          1. float desiredMVL;
-          2. float desiredMVR;
-    Requirement: None
-    Input: None
-    Output: None
-    Usage; Call this function within the class to compute desiredMVL and desiredMVR
-    */
+    /** update desiredMVL and desiredMVR to match a given curvature and velocity */
     void computeDesiredV(float forwardVel, float K);
-    /*Function Name: void turnToGo1(const RobotPosition & robotPos);
-    Effect: modify the member variable desiredMVL and desiredMVR based on the next goal position (X,Y)
-    Modifies: 1. int currentTask;
-              2. float phiGoal;
-              3. float pathGoal;
-              4. float xlast;
-              5. float ylast;
-              6. float philast;
-    Requirement: None
-    Input: None
-    Output: None
-    Usage; Call this function in each timed loop to update the desired wheel velocity
+
+    /**
+    update desiredMVL and desiredMVR to drive to the goal location
+    this happens in two steps:
+    1. turn to face the goal
+    2. drive to it
+
+    This function does not do all its work in one iteration, and must be called repeatedly
+
+    Does not respect reportData.commandPhi
     */
     void turnToGo(const RobotPosition & robotPos, SerialCommunication & reportData);
 
-    /*Function Name: void OrientationController(const RobotPosition & robotPos, SerialCommunication & reportData);
-    Effect: modify the member variable desiredMVL and desiredMVR based on the next goal position (X,Y) to turn the heading to align with the next point.
-    Modifies: 1. float desiredMVL;
-              2. float desiredMVR;
-              2. float phiGoal;
-
-    Requirement: None
-    Input: None
-    Output: None
-    Usage; Call this function in each timed loop to update the desired wheel velocity
+    /**
+    adjusts desiredMVL and desiredMVR to stay at the current velocity, but steer towards the goal
+    This function does not do all its work in one iteration, and must be called repeatedly
     */
-    bool OrientationController(const RobotPosition & robotPos, SerialCommunication & reportData);
-
-
+    bool OrientationController(const RobotPosition & robotPos, const SerialCommunication & reportData);
 
   private:
     unsigned long prevSerialTime;
+    float pathGoal;
+    RobotPosition lastRobotPos;
+    Angle turnBegin;
+    Angle turnEnd;
 };
