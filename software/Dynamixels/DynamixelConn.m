@@ -75,5 +75,9 @@ classdef DynamixelConn < handle
 			calllib('dynamixel','dxl_terminate');
 			unloadlibary('dynamixel');
 		end
+
+		function m = mxmotor(obj, id)
+			m = DynamixelMX(obj, id)
+		end
 	end
 end
