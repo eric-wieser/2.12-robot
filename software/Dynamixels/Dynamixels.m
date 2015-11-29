@@ -110,8 +110,8 @@ classdef Dynamixels
         end
 
         function SetBounds(obj, id, min, max)
-            SetAngle(obj, id, 6, min);
-            SetAngle(obj, id, 8, max);
+            SetAngle(obj, id, obj.R_CWAngleLimit, min);
+            SetAngle(obj, id, obj.R_CCWAngleLimit, max);
         end
 
         function SetTorque(obj, id, torque_limit)
