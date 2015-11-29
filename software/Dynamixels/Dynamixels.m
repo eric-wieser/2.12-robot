@@ -46,14 +46,26 @@ classdef Dynamixels
             % goal pos (positive to the up)
             P_GOAL_POSITION = 30;
             % write it
-                init_pos1 = 500;
-                init_pos2 = 2500;
+                init_pos1 = -15803;%500;
+                init_pos2 = 1102;%6500;%2500;
 %             init_pos1 = -500;
 %             init_pos2 = 4000;
             if (id == 1)
                 calllib('dynamixel','dxl_write_word',id,P_GOAL_POSITION,Pos+init_pos1);
             else
                 calllib('dynamixel','dxl_write_word',id,P_GOAL_POSITION,-Pos+init_pos2);  %attention servo do not turn in same direction
+            end
+        end
+        
+        function freeze(obj, id, Pos)
+            % this is the Register on the Servo that corresponds to the
+            % goal pos (positive to the up)
+            P_GOAL_POSITION = 30;
+            % write it
+            if (id == 1)
+                calllib('dynamixel','dxl_write_word',id,P_GOAL_POSITION,Pos);
+            else
+                calllib('dynamixel','dxl_write_word',id,P_GOAL_POSITION,Pos);  %attention servo do not turn in same direction
             end
         end
         
