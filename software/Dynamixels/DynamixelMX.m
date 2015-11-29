@@ -67,7 +67,11 @@ classdef DynamixelMX < handle
             obj.id = id;
             obj.conn = conn;
 
-            % obj.ping();
+            obj.ping();
+        end
+
+        function delete(obj)
+            subsasgn(obj, 'TorqueEnable', 0);
         end
 
         % wrap the connection functions
@@ -87,19 +91,6 @@ classdef DynamixelMX < handle
             res = obj.conn.read_byte(obj.id, reg);
         end
 
-        % set the position of a single servo -- range 0 to 4095, centered
-        % at 2047
-        function SetGoalPos(obj, id, Pos)
-            obj.write_word(obj.R_GoalPosition, Pos);
-        end
-
-        function freeze(obj, id, Pos)
-            if (id == 1)
-                calllib('dynamixel','dxl_write_word',id,obj.R_GoalPosition,Pos);
-            else
-                calllib('dynamixel','dxl_write_word',id,obj.R_GoalPosition,Pos);  %attention servo do not turn in same direction
-            end
-		end
 
 		function val = subsref(obj, s)
 			curr = s(1);
@@ -128,14 +119,14 @@ classdef DynamixelMX < handle
                 val = builtin('subsref', obj, s);
 			end
 		end
-		
+
 		function obj = subsasgn(obj, s, val)
 			curr = s(1);
 			if curr.type == '.'
 				if length(s) > 1
 					error('cannot deal with nesting');
 				end
-	
+
 				name = curr.subs;
                 try
 				    reg = DynamixelMX.registers(name);
@@ -144,7 +135,7 @@ classdef DynamixelMX < handle
                     val = builtin('subsref', obj, s);
 					return;
 				end
-				
+
 				if ~w
 					error('Register is readonly');
 					return
