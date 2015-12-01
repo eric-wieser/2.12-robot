@@ -5,6 +5,7 @@
 #include "Drive.h"
 
 const float maxSpeed = 0.44;
+const int maxPower = 400;
 
 MotorController::MotorController(Drive& d) : drive(d) {
   mRCommand = 0;
@@ -15,10 +16,12 @@ MotorController::MotorController(Drive& d) : drive(d) {
 void MotorController::controlMR(float desV, float currV) {
   desV = constrain(desV,-maxSpeed, maxSpeed);
   mRCommand += mRController.update(desV, currV);
-  drive.setMRSpeed(constrain(mRCommand, -400, 400));
+  mRCommand = constrain(mRCommand, -maxPower, maxPower);
+  drive.setMRSpeed(mRCommand);
 }
 void MotorController::controlML(float desV, float currV) {
   desV = constrain(desV,-maxSpeed, maxSpeed);
   mLCommand += mLController.update(desV, currV);
-  drive.setMLSpeed(constrain(mLCommand, -400, 400));
+  mLCommand = constrain(mLCommand, -maxPower, maxPower);
+  drive.setMLSpeed(mLCommand);
 }
