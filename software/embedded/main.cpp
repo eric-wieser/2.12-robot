@@ -26,6 +26,12 @@ void Main::loop() {
     measureRobot.update(); //check encoder
     robotPos.update(measureRobot.dThetaL, measureRobot.dThetaR); //update position
 
+    if(reportData.gpsData.received > prevTime) {
+      robotPos.pos = reportData.gpsData.pos;
+      robotPos.Phi = reportData.gpsData.phi;
+      Serial.print('Updated from the GPS data');
+    }
+
     reportData.sendSerialData(robotPos); //report data to matlab via serial communication
     reportData.receiveSerialData();
     //pathPlanner.LabTestRun(robotPos); //plan the next path
