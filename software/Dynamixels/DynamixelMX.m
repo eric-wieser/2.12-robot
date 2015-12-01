@@ -13,6 +13,12 @@ classdef DynamixelMX < handle
     properties (Constant, Access=private)
         registers = DynamixelMX.makeRegisters();
     end
+    
+    properties (Dependent)
+       GoalPosition
+       PresentPosition
+       MovingSpeed
+    end
 
     methods (Static, Access=private)
         function registers = makeRegisters()
@@ -72,7 +78,7 @@ classdef DynamixelMX < handle
         end
 
         function delete(obj)
-            subsasgn(obj, 'TorqueEnable', 0);
+            set(obj, 'TorqueEnable', 0);
         end
 
         % wrap the connection functions
@@ -91,28 +97,59 @@ classdef DynamixelMX < handle
         function res = read_byte(obj, reg)
             res = obj.conn.read_byte(obj.id, reg);
         end
+        
+        function val = get(obj, name)
+            if isscalar(obj)
+                reg = DynamixelMX.registers(name);
+                [addr, regsize, w] = reg{:};
+                if regsize == 1
+                    val = obj.read_byte(addr);
+                elseif regsize == 2
+                    val = obj.read_word(addr);
+                else
+                    error('unknown size')
+                end
+            else
+                val = zeros(size(obj));
+                for i=1:numel(obj)
+                    val(i) = get(obj(i), name);
+                end
+            end
+        end
+        
+        function set(obj, name, val)
+            if isscalar(obj)
+                reg = DynamixelMX.registers(name);
+                [addr, size, w] = reg{:};
+
+                if ~w
+                    error('Register is readonly');
+                end
+            
+                if size == 1
+                    obj.write_byte(addr, val);
+                elseif size == 2
+                    obj.write_word(addr, val);
+                else
+                    error('unknown size')
+                end
+            else
+                for i=1:numel(obj)
+                    set(obj(i), name, val)
+                end
+            end
+        end
 
 
 		function val = subsref(obj, s)
 			curr = s(1);
 			if curr.type == '.'
-				name = curr.subs;
                 try
-				    reg = DynamixelMX.registers(name);
-    				[addr, size, w] = reg{:};
-                catch
+                    val = get(obj, curr.subs);
+                catch                
                     val = builtin('subsref', obj, s);
-					return;
                 end
-
-				if size == 1
-					val = obj.read_byte(addr);
-				elseif size == 2
-					val = obj.read_word(addr);
-				else
-					error('unknown size')
-				end
-
+                
 				if length(s) > 1
 					val = subsref(val, s(2:end));
 				end
@@ -128,27 +165,7 @@ classdef DynamixelMX < handle
 					error('cannot deal with nesting');
 				end
 
-				name = curr.subs;
-                try
-				    reg = DynamixelMX.registers(name);
-    				[addr, size, w] = reg{:};
-                catch
-                    val = builtin('subsref', obj, s);
-					return;
-				end
-
-				if ~w
-					error('Register is readonly');
-					return
-				end
-
-				if size == 1
-					obj.write_byte(addr, val);
-				elseif size == 2
-					obj.write_word(addr, val);
-				else
-					error('unknown size')
-				end
+				set(obj, curr.subs, val);
 			else
                 builtin('subsasgn', obj, s, val);
 			end
