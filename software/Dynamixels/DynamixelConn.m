@@ -34,50 +34,50 @@ classdef DynamixelConn < handle
 		function ping(obj, id)
 			calllib('dynamixel','dxl_ping', id);
 			stat = calllib('dynamixel','dxl_get_result');
-			if stat ~= COMM_RXSUCCESS
-				error('dynamixel:io', ['Error during ping: ' comm_names{stat}]);
+			if stat ~= obj.COMM_RXSUCCESS
+				error('dynamixel:io', ['Error during ping: ' DynamixelConn.comm_names{stat+1}]);
 			end
 		end
 
 		function res = read_word(obj, id, reg)
 			res = calllib('dynamixel','dxl_read_word', id, reg);
 			stat = calllib('dynamixel','dxl_get_result');
-			if stat ~= COMM_RXSUCCESS
-				error('dynamixel:io', ['Error during read_word: ' comm_names{stat}]);
+			if stat ~= DynamixelConn.COMM_RXSUCCESS
+				error('dynamixel:io', ['Error during read_word: ' DynamixelConn.comm_names{stat+1}]);
 			end
 		end
 
 		function write_word(obj, id, reg, value)
 			calllib('dynamixel','dxl_write_word', id, reg, value);
 			stat = calllib('dynamixel','dxl_get_result');
-			if stat ~= COMM_TXSUCCESS
-				error('dynamixel:io', ['Error during write_word: ' comm_names{stat}]);
+			if stat ~= DynamixelConn.COMM_RXSUCCESS
+				error('dynamixel:io', ['Error during write_word: ' DynamixelConn.comm_names{stat+1}]);
 			end
 		end
 
 		function res = read_byte(obj, id, reg)
 			res = calllib('dynamixel','dxl_read_byte', id, reg);
 			stat = calllib('dynamixel','dxl_get_result');
-			if stat ~= COMM_RXSUCCESS
-				error('dynamixel:io', ['Error during read_byte: ' comm_names{stat}]);
+			if stat ~= DynamixelConn.COMM_RXSUCCESS
+				error('dynamixel:io', ['Error during read_byte: ' DynamixelConn.comm_names{stat+1}]);
 			end
 		end
 
 		function write_byte(obj, id, reg, value)
 			calllib('dynamixel','dxl_write_byte', id, reg, value);
 			stat = calllib('dynamixel','dxl_get_result');
-			if stat ~= COMM_TXSUCCESS
-				error('dynamixel:io', ['Error during write_byte: ' comm_names{stat}]);
+			if stat ~= DynamixelConn.COMM_RXSUCCESS
+				error('dynamixel:io', ['Error during write_byte: ' DynamixelConn.comm_names{stat+1}]);
 			end
 		end
 
 		function delete(obj)
 			calllib('dynamixel','dxl_terminate');
-			unloadlibary('dynamixel');
+			unloadlibrary('dynamixel');
 		end
 
 		function m = mxmotor(obj, id)
-			m = DynamixelMX(obj, id)
+			m = DynamixelMX(obj, id);
 		end
 	end
 end
