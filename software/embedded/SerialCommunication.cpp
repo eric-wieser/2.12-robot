@@ -6,6 +6,7 @@
 SerialCommunication::SerialCommunication() {
   prevSerialTime = micros();
   finished = true;
+  gpsData.received = 0;
 }
 
 void SerialCommunication::sendSerialData(const RobotPosition & robotPos) {
