@@ -39,7 +39,7 @@ function navigation
 
     %Try starting a serial connection with the Arduino
     try
-        arduino = Arduino('COM4');  % Use Arduino IDE to see which com port the Arduino UNO is using
+        arduino = Arduino('COM3');  % Use Arduino IDE to see which com port the Arduino UNO is using
     catch e
         switch e.identifier
 			case 'MATLAB:serial:fopen:opfailed'

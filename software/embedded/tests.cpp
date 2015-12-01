@@ -36,7 +36,7 @@ void tests::motor_wiring() {
 		uint32_t encr = md.getMREncoder();
 		uint32_t encl = md.getMLEncoder();
 		Serial.flush();
-		md.setMRSpeed(400);
+		md.setMRSpeed(100);
 		delay(2e3);
 		md.setMRSpeed(0);
 		int32_t diffr = md.getMREncoder() - encr;
@@ -51,7 +51,7 @@ void tests::motor_wiring() {
 		uint32_t encr = md.getMREncoder();
 		uint32_t encl = md.getMLEncoder();
 		Serial.flush();
-		md.setMLSpeed(400);
+		md.setMLSpeed(100);
 		delay(2e3);
 		md.setMLSpeed(0);
 		int32_t diffr = md.getMREncoder() - encr;

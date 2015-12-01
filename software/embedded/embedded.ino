@@ -15,14 +15,14 @@ Main * m;
 void setup() {
   Serial.begin(115200);      // Initialize Serial Communication
   Serial.println("Starting up");
-  m = new(buffer) Main();
-  // tests::motor_feedback();
+  // m = new(buffer) Main();
+  tests::motor_wiring();
   Serial.println("done");
   Serial.flush();
 }
 
 void loop() {
-  m->loop();
+  // m->loop();
 }
 
 
