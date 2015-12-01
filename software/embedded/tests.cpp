@@ -154,9 +154,14 @@ void tests::motor_feedback() {
 
 			i++;
 			if(i % 100 == 0) {
-				Serial.print(measure.mVR);
+				Serial.print(measure.encoderRCount);
 				Serial.print(", ");
-				Serial.println(measure.mVL);
+				Serial.println(measure.encoderLCount);
+				Serial.print(": ");
+
+				Serial.print(measure.mVR, 4);
+				Serial.print(", ");
+				Serial.println(measure.mVL, 4);
 			}
 			if(md.faulted()) {
 				Serial.println("Motor fault");
