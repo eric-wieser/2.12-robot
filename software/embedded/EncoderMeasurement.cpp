@@ -6,7 +6,7 @@
 #include "Drive.h"
 
 //Encoder Measurement Class function implementation
-EncoderMeasurement::EncoderMeasurement(Drive &drive) : drive(drive) {
+EncoderMeasurement::EncoderMeasurement(const Drive &drive) : drive(drive) {
   encoderRCount = 0;
   encoderLCount = 0;
   dEncoderR = 0;

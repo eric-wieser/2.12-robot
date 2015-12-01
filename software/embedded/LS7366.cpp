@@ -63,7 +63,7 @@ void LS7366::configure() {
   digitalWrite(cs_pin,HIGH);       // Terminate SPI conversation
 }
 
-uint32_t LS7366::read() {
+uint32_t LS7366::read() const {
   uint32_t result = 0;
 
   digitalWrite(cs_pin, LOW);      // Begin SPI conversation

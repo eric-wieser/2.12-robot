@@ -1,7 +1,8 @@
+#pragma once
 
 //Some useful constant definitions
-#define FREQ 2000
-#define PERIOD 0.0005
-#define PERIOD_MICROS 500
-#define b 0.225
-#define r 0.037
+const float FREQ = 2000;
+const float PERIOD = 0.0005;
+const float PERIOD_MICROS = 500;
+const float b = 0.225;
+const float r = 0.037;

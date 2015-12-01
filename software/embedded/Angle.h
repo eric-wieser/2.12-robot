@@ -7,6 +7,12 @@ A class representing an angle, and dealing with wraparound in [-PI, PI)
 
 	Angle + float -> Angle
 	Angle - float -> Angle
+
+Example:
+
+    float d_angle = Angle(1.5*M_PI) - Angle(0.25*M_PI);
+    assert(d_angle == -0.75*M_PI)
+
 */
 class Angle {
 private:
@@ -34,3 +40,11 @@ public:
 	friend inline float sin(Angle a) { return sinf(a._value); }
 	friend inline float tan(Angle a) { return tanf(a._value); }
 };
+
+
+// when unlerping angles, we want the discontinuity far from the ends
+inline float unlerp(Angle a, Angle b, Angle lerped) {
+	float span = b - a;
+	Angle center = a + span/2;
+	return 0.5 + (lerped - center) / span;
+}

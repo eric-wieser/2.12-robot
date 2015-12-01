@@ -9,7 +9,7 @@ public:
 	LS7366(int pin);
 	void begin();
 	void configure();
-	uint32_t read();
+	uint32_t read() const;
 	void clear();
 };
 

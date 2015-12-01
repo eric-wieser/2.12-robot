@@ -2,6 +2,7 @@
 
 // needed for String
 #include "Arduino.h"
+#include "Vector.h"
 
 // forward declaration
 class RobotPosition;
@@ -9,9 +10,6 @@ class RobotPosition;
 #define SERIAL_FREQ 100
 #define SERIAL_PERIOD 0.01
 #define SERIAL_PERIOD_MICROS 10000
-
-extern unsigned long currentSerialTime;
-extern unsigned long prevSerialTime;
 
 
 /*
@@ -28,19 +26,23 @@ External Variable Dependency:
 class SerialCommunication {
   public:
     float command[10];
-    float commandX;
-    float commandY;
+    Vector commandPos;
     float commandPhi;
     bool finished;
-    /*Function Name: initialize();
-    Effect: Initialize all public member variables of the class to 0 and prevSerialTime to micro()
-    Modifies: All member variables
-    Requirement: None
-    Input: None
-    Output: None
-    Usage; Call this function upon instantiation of the class to a global object
-    */
-    void initialize();
+
+    struct GPSReport {
+        Vector pos;
+        Angle phi;
+        uint32_t received;
+    };
+
+    GPSReport gpsData;
+
+    float servoGoal;
+
+    bool killRequested = false;
+
+    SerialCommunication();
     /*Function Name: sendSerialData(const RobotPosition & robotPos);
     Effect: report serial data to matlab
     Modifies: None
@@ -77,5 +79,4 @@ class SerialCommunication {
     unsigned long prevSerialTime;
     String commandString;
     String tempString;
-    int indexPointer = 0;
 };

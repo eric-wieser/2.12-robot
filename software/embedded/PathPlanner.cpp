@@ -1,53 +1,16 @@
 #include "PathPlanner.h"
 
+#include "Arduino.h"
+#include "constants.h"
 #include "RobotPosition.h"
 #include "SerialCommunication.h"
-#include "constants.h"
+#include "util.h"
 
 //PathPlanner Class function implementation
-void PathPlanner::initialize() {
-  currentTask = 1;
+PathPlanner::PathPlanner() {
+  currentTask = Task::IDLE;
   desiredMVL = 0;
   desiredMVR = 0;
-  phiGoal = 0;
-  xlast = 0;
-  ylast = 0;
-  philast = 0;
-  pathlast = 0;
-  phiDesired = 0;
-  pathDesired = 0;
-}
-
-void PathPlanner::LabTestRun(const RobotPosition & robotPos) {
-  if (currentTask == 1) { //we are moving forward
-    if (robotPos.pathDistance < 1.0) { //if we aren't there yet, keep going
-      computeDesiredV(.2, 0);
-
-    } else { //if we are there, stop, reset distances, and move on to the next task
-      desiredMVR = 0;
-      desiredMVL = 0;
-      currentTask = 2;
-    }
-  }
-  if (currentTask == 2) { //we are turning around
-    if (robotPos.pathDistance < 1.0 + (PI * .25)) { //if we aren't there yet, keep going
-      computeDesiredV(.1, 4);
-    } else { //if we are there, stop and move on to the next task
-      desiredMVR = 0;
-      desiredMVL = 0;
-      currentTask = 3;
-    }
-  }
-  if (currentTask == 3) { //we are going back home
-    if (robotPos.pathDistance < 2.0 + (PI * .25) ) { //if we aren't there yet, keep going
-      computeDesiredV(.2, 0);
-    } else { //if we are there, stop and move on to the next task
-      desiredMVR = 0;
-      desiredMVL = 0;
-      currentTask = 4;
-      Serial.println("DONE MOVING");
-    }
-  }
 }
 
 void PathPlanner::computeDesiredV(float forwardVel, float K) {
@@ -56,71 +19,86 @@ void PathPlanner::computeDesiredV(float forwardVel, float K) {
   desiredMVL = forwardVel * (1 - K * b);
 }
 
-bool PathPlanner::OrientationController(const RobotPosition & robotPos,
-                                        const SerialCommunication & reportData,
-                                        float kp) {
-  float distEps = 0.025; //2.5 cm
+bool PathPlanner::OrientationController(const RobotPosition & robotPos, const SerialCommunication & reportData) {
+  const float eps = .01;
+  float KPhi = .50;
 
-  float dx = reportData.commandX - robotPos.X;
-  float dy = reportData.commandY - robotPos.Y;
-  bool closeEnough = dx*dx + dy*dy > distEps*distEps;
-  if(closeEnough) {
-    return true;
+  Vector delta = reportData.commandPos - robotPos.pos;
+  Angle phiGoal = delta.angle();
+  float phiError = phiGoal - robotPos.Phi;
+
+  if (abs(phiError) > PI/3){
+    KPhi = 10.0;
   }
-  phiGoal = atan2(dy, dx);
 
-  // P controller
-  const float unsaturatedKphi = 0.41 / PI;  // full speed at full error
-  float KPhi = unsaturatedKphi * kp;
-  float currentPhiError = phiGoal - robotPos.Phi;
+  desiredMVR += KPhi * phiError*2.0*b;
+  desiredMVL -= KPhi * phiError*2.0*b;
 
-  // normalize error within [-PI, PI)
-  while(currentPhiError >= PI) currentPhiError -= PI;
-  while(currentPhiError < -PI) currentPhiError += PI;
-
-  // modify desired velocities
-  float deltaVel = currentPhiError * KPhi;
-  desiredMVR += deltaVel;
-  desiredMVL -= deltaVel;
-
-  return false;
+  return delta.magnitudeSq() < eps*eps;
 }
 
 void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication & reportData) {
-  if(currentTask == 1) {
-    // the robot is waiting to receive command (x,y)
-    desiredMVR = desiredMVL = 0;
+  //take next point (X,Y) positions given by MatLab, calculate phi to turn towards, then go straight
 
-    if(!reportData.finished) currentTask = 2;
+  if (currentTask == Task::IDLE) { // waiting to receive command x,y
+    desiredMVR = 0;
+    desiredMVL = 0;
+    if (!reportData.finished){
+      currentTask = Task::TURN;
+      turnBegin = robotPos.Phi;
+      Vector dist = reportData.commandPos - robotPos.pos;
+
+      // skip small movements
+      if(dist.magnitudeSq() < 0.025*0.025) currentTask = Task::DONE;
+      turnEnd = dist.angle();
+    }
   }
-  else if(currentTask == 2) {
-    desiredMVL = desiredMVR = 0;
-    OrientationController(robotPos, reportData, 8);
 
-    const float phiEps = PI / 180 * 2.5;
+  if (currentTask == Task::TURN) { //turn towards next point
+    static const Spline turnSpline(0, 1, 0.3, 0.1);
 
-    if(abs(phiGoal - robotPos.Phi) < phiEps) currentTask = 3;
+    // interpolate our motor speeds quadratically in angle
+    float through_turn = unlerp(turnBegin, turnEnd, robotPos.Phi);
+    float speed = sgn(turnEnd  - turnBegin) * turnSpline.eval_dp(through_turn);
+
+    desiredMVR = speed;
+    desiredMVL = -speed;
+
+    // move on
+    if(through_turn >= 1 || turnBegin == turnEnd) {
+      desiredMVR = 0;
+      desiredMVL = 0;
+      currentTask = Task::STRAIGHT;
+      pathGoal = robotPos.pathDistance + (reportData.commandPos - robotPos.pos).magnitude();
+    }
   }
-  else if(currentTask == 3) {
-    // the robot is going straight toward the next way point
-    desiredMVL = 0.3;
-    desiredMVR = 0.3;
-    bool done = OrientationController(robotPos, reportData, 2);
-    reportData.updateStatus(done);
 
-    if(reportData.finished) currentTask = 1;
+  if (currentTask == Task::STRAIGHT) { //now go straight to next point
+    float speed = 0.4;
+
+    // slow down near the goal
+    const float slow_within = 0.2;
+    const float slow_to = 0.15;
+    float to_go = pathGoal - robotPos.pathDistance;
+    if (to_go < slow_within)
+      speed = lerp(slow_to, speed, to_go / slow_within);
+
+    if (to_go > 0) {
+      //if we aren't there yet, keep going
+      desiredMVR = speed;
+      desiredMVL = speed;
+      bool done = OrientationController(robotPos, reportData);
+      if(done) currentTask = Task::DONE;
+    } else {
+      currentTask = Task::DONE;
+    }
   }
-  /* Here separate task into three cases:
-  if currentTask = 1, 
-  if currentTask = 2, the robot is turning to face the next way point
-  if currentTask = 3, the robot is going straight toward the next way point
-
-  Note for task 1, you need a condition to check whether a new way point is received
-
-  For task 2, use lastPhiError to check if the robot need to turn clockwise or counter clockwise.
-  If there is lastPhiError = 0, then the robot does not need to turn.
-
-  End with a condition that tells us that the way point has been reached
-  e.g., reportData.updateStatus(true);
-  */
+  if (currentTask == Task::DONE) { //done
+    desiredMVR = 0;
+    desiredMVL = 0;
+    currentTask = Task::IDLE;
+    lastRobotPos = robotPos;
+    Serial.println("NEXT POINT");
+    reportData.updateStatus(true);
+  }
 }

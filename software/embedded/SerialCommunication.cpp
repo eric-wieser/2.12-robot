@@ -3,15 +3,17 @@
 #include "RobotPosition.h"
 
 //SerialCommunication Class function implementation
-void SerialCommunication::initialize() {
+SerialCommunication::SerialCommunication() {
   prevSerialTime = micros();
+  finished = true;
 }
 
 void SerialCommunication::sendSerialData(const RobotPosition & robotPos) {
   if (micros() - prevSerialTime >= SERIAL_PERIOD_MICROS) {
-    Serial.print(robotPos.X, 6); //X
+    Serial.print("P");
+    Serial.print(robotPos.pos.x, 6); //X
     Serial.print(",");
-    Serial.print(robotPos.Y, 6); //Y
+    Serial.print(robotPos.pos.y, 6); //Y
     Serial.print(",");
     Serial.print(float(robotPos.Phi)); //Phi
     Serial.print(",");
@@ -23,8 +25,11 @@ void SerialCommunication::sendSerialData(const RobotPosition & robotPos) {
 void SerialCommunication::receiveSerialData() {
   if (Serial.available() > 0) {
     commandString = Serial.readString();
+    char type = commandString[0];
+    commandString = commandString.substring(1);
+
     int i = 0;
-    indexPointer = 0;
+    int indexPointer = 0;
     while (indexPointer != -1 ) {
       indexPointer = commandString.indexOf(',');
       tempString = commandString.substring(0, indexPointer);
@@ -32,10 +37,32 @@ void SerialCommunication::receiveSerialData() {
       command[i] = tempString.toFloat();
       ++i;
     }
-    commandX = command[0];
-    commandY = command[1];
-    commandPhi = command[2];
-    updateStatus(false);
+
+
+    if(type == 'D') {
+      commandPos.x = command[0];
+      commandPos.y = command[1];
+      commandPhi = command[2];
+      updateStatus(false);
+    }
+    else if(type == 'G') {
+      gpsData.pos.x = command[0];
+      gpsData.pos.y = command[1];
+      gpsData.phi = command[2];
+      gpsData.received = micros(); // TODO: use the gps timestamp?
+    }
+    else if (type == 'S') {
+      servoGoal = command[0];
+    }
+    else if (type == 'K') {
+      killRequested = true;
+    }
+    else {
+      Serial.print("Unimplemented command type '");
+      Serial.print(type);
+      Serial.println("'");
+      return;
+    }
   }
 }
 
