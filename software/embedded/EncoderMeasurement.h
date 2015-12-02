@@ -39,12 +39,12 @@ class EncoderMeasurement {
     Usage; Call this function upon instantiation of the class to a global object
     */
     void update();
+    uint32_t encoderRCount;    //encoder 1 counts in ticks for the current cycle
+    uint32_t encoderLCount;   //encoder 2 counts in ticks for the current cycle
 
   private:
     const Drive &drive;
 
-    uint32_t encoderRCount;    //encoder 1 counts in ticks for the current cycle
-    uint32_t encoderLCount;   //encoder 2 counts in ticks for the current cycle
     int dEncoderR;    //encoder increment 1
     int dEncoderL;    //encoder increment 2
 
