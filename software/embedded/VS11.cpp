@@ -1,4 +1,5 @@
 #include "VS11.h"
+#include "Arduino.h"
 
 VS11::VS11() {
 	// configure timers and PWM here

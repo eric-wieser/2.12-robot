@@ -3,4 +3,5 @@ namespace tests {
 	void encoder_wiring();
 	void motor_feedback();
 	void measurements();
+	void servo();
 }
