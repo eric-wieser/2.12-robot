@@ -6,14 +6,13 @@ function plot_arena
 	br = [1548;1034];
 
 	background = imread('Arena.PNG');
-	size(background)
 
 	clipped = background(tl(2):br(2),tl(1):br(1),:);
 
 	RI = imref2d(size(clipped));
-	RI.XWorldLimits = [0 field_width];
-	RI.YWorldLimits = [0 field_height];
-	set(gca,'YDir','normal');
+	RI.XWorldLimits = field_width * [-1 1] /2;
+	RI.YWorldLimits = field_height * [-1 1] /2;
 	imshow(flipud(clipped), RI);
+	set(gca,'YDir','normal');
 	axis on;
 end

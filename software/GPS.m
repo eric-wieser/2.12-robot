@@ -17,6 +17,7 @@ classdef GPS
 
 		% returns values in origin-centered coordinates
 		function res = read(obj)
+			fwrite(obj.conn, 'r');
 			data = [fread(obj.conn,3,'single')' fread(obj.conn,1,'single')];
 			res.x = data(1);
 			res.y = data(2);
