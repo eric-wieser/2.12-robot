@@ -9,6 +9,8 @@ and delete the contents of loop()
 */
 #include "tests.h"
 
+#include "math.h"
+
 #include "Drive.h"
 #include "EncoderMeasurement.h"
 #include "RobotPosition.h"
@@ -172,5 +174,22 @@ void tests::motor_feedback() {
 			}
 		}
 	}
+
+}
+
+
+void tests::servo() {
+	VS11 servo;
+
+	servo.setGoal(0);
+	delay(500);
+	Serial.println("+90");
+	servo.setGoal(M_PI/2);
+	delay(500);
+	Serial.println("-90");
+	servo.setGoal(-M_PI/2);
+	delay(500);
+	Serial.println("0");
+	servo.setGoal(0);
 
 }
