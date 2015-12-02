@@ -33,11 +33,12 @@ classdef Arm
             a = 5;
             tic;
             while toc < 20
-                x = 10+ a*cos(f*toc);
+                x = 10 + a*cos(f*toc);
                 y = 30 + a*sin(f*toc);               
                 [theta1, theta2] = obj.findThetas(x,y);
                 obj.shoulder.GoalPosition = obj.rad2value(theta1);
                 obj.elbow.GoalPosition = obj.rad2value(theta2);
+                obj.setHandTarget(2*pi-theta1-theta2);
             end
         end
 
