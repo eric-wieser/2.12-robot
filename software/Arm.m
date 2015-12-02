@@ -1,4 +1,4 @@
-classdef Arm
+classdef Arm < handle
 	properties
 		arduino
 		shoulder
@@ -28,12 +28,36 @@ classdef Arm
 		function sweepSnow(obj)
 			% TODO
 			% obj.shoulder.GoalPosition = ...;
-			% obj.setHandTarget(...);
-
-		end
+			% obj.setHandTarget(...); 
+            f = 0.5*2*pi;
+            a = 5;
+            tic;
+            while toc < 20
+                x = 10 + a*cos(f*toc);
+                y = 30 + a*sin(f*toc);               
+                [theta1, theta2] = obj.findThetas(x,y);
+                obj.shoulder.GoalPosition = obj.rad2value(theta1);
+                obj.elbow.GoalPosition = obj.rad2value(theta2);
+                obj.setHandTarget(2*pi-theta1-theta2);
+            end
+        end
 
 		function sweepRoof(obj)
 			% TODO
-		end
+        end
+        
+        function [theta1, theta2] = findThetas(obj, x, y)
+            hyp = sqrt(x^2 + y^2);
+            alpha = atan2(y,x);
+            beta = acos((obj.l1^2 + hyp^2 - obj.l2^2)/(2 * hyp * obj.l1));
+            gamma = acos((obj.l2^2 + obj.l1^2 - hyp^2)/(2 * obj.l1 * obj.l2));
+            theta1 = pi/2 - alpha - beta;
+            theta2 = pi - gamma;
+        end
+        
+        function Pos = rad2value(positionInRadians)
+            constrained = mod((positionInRadians + pi),(2*pi)) - pi;
+            Pos = round((constrained + pi) * (4095) / (2*pi));
+        end
 	end
 end
