@@ -15,9 +15,6 @@ classdef DynamixelMX < handle
     end
     
     properties (Dependent)
-       GoalPosition
-       PresentPosition
-       MovingSpeed
     end
 
     methods (Static, Access=private)
@@ -146,8 +143,13 @@ classdef DynamixelMX < handle
 			if curr.type == '.'
                 try
                     val = get(obj, curr.subs);
-                catch                
-                    val = builtin('subsref', obj, s);
+                catch e
+                    switch e.identifier
+                        case 'MATLAB:Containers:Map:NoKey'
+                            val = builtin('subsref', obj, s);
+                        otherwise
+                            rethrow(e)
+                    end
                 end
                 
 				if length(s) > 1
