@@ -7,7 +7,7 @@ VS11::VS11() {
 
 void VS11::setGoal(float goal) {
 	/* adjust PWM frequency here
-	From the documentationL:
+	From the documentation (http://www.vigorprecision.com.hk/uploadfile/20120530/20120530150204367.pdf):
 		 700us - one extreme
 		1500us - center position
 		2200us - other extreme
