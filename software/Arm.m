@@ -1,4 +1,4 @@
-classdef Arm
+classdef Arm < handle
 	properties
 		arduino
 		shoulder

@@ -1,4 +1,4 @@
-classdef GPS
+classdef GPS < handle
 	properties (Access=private)
 		conn
 	end
