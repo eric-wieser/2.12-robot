@@ -6,14 +6,14 @@ classdef Rail < handle
         left
         right
         
-        init_pos_right = 46117;
-        init_pos_left = 3995;
+        top_height = 7880;
+        max_diff = 1880;
     end
     
     methods
         function obj = Rail(conn)
-            obj.right = conn.mxmotor(1);
-            obj.left = conn.mxmotor(2);
+            obj.right = conn.mxmotor(3);
+            obj.left = conn.mxmotor(4);
             
             max_torque = 500;
             right.MaxTorque = max_torque;
@@ -23,22 +23,25 @@ classdef Rail < handle
 
             right.MovingSpeed = 1023;
             left.MovingSpeed = 1023;
+            
+            right.ResolutionDivider = 4;
+            left.ResolutionDivider = 4;
         end
         
         function setPoses(obj, pos)
-            obj.right.GoalPosition = obj.init_pos_right + pos(1);
-            obj.left.GoalPosition = obj.init_pos_left - pos(2);
+            obj.right.GoalPosition = pos(1);
+            obj.left.GoalPosition = - pos(2);
         end
         function pos = getPoses(obj)
             pos = [
-                obj.right.PresentPosition - obj.init_pos_right;
-                obj.init_pos_left - obj.left.PresentPosition;
+                obj.right.PresentPosition;
+                -obj.left.PresentPosition;
             ];
         end
         
         function obj = setOrigin(obj)
-            obj.init_pos_right = obj.right.PresentPosition;
-            obj.init_pos_left = obj.left.PresentPosition;
+            obj.left.MultiTurnOffset = obj.left.MultiTurnOffset - obj.left.PresentPosition;
+            obj.right.MultiTurnOffset = obj.right.MultiTurnOffset - obj.right.PresentPosition;
         end
         
         function raiseRel(obj, amt)
@@ -56,13 +59,28 @@ classdef Rail < handle
             obj.setPoses([0; 0]);
         end
         function raise(obj)
-            obj.setPoses([20500; 20500]);
+            obj.setPoses([obj.top_height; obj.top_height]);
         end
         function dumpSnow(obj)
-            obj.setPoses([20500; 27900]);
+            obj.setPoses([obj.top_height - obj.max_diff; obj.top_height]);
         end
         function dumpDebris(obj)
-            obj.setPoses([27900; 20500]);
+            obj.setPoses([obj.top_height; obj.top_height - obj.max_diff]);
+        end
+        function wiggle(obj, n)
+           pos = obj.getPoses;
+           size = 50;
+           delay = 0.05;
+           for i=1:n
+               obj.setPoses(pos + size * [1;1]);
+               pause(delay);
+               obj.setPoses(pos + size * [1;-1]);
+               pause(delay);
+               obj.setPoses(pos + size * [-1;-1]);
+               pause(delay);
+               obj.setPoses(pos + size * [-1;1]);
+               pause(delay);
+           end
         end
     end
 end

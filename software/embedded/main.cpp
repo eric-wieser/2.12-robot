@@ -32,7 +32,7 @@ void Main::loop() {
       Serial.print("Updated from the GPS data");
     }
 
-    handServo.setGoal(reportData.servoGoal);
+    // handServo.setGoal(reportData.servoGoal);
 
     reportData.sendSerialData(robotPos); //report data to matlab via serial communication
     reportData.receiveSerialData();
@@ -43,6 +43,12 @@ void Main::loop() {
     moveRobot.controlMR(pathPlanner.desiredMVR, measureRobot.mVR); // right motor PI control
     moveRobot.controlML(pathPlanner.desiredMVL, measureRobot.mVL); //left motor PI control
     prevTime = currentTime; //update timer
+
+    if(drive.faulted()) {
+      Serial.println("Motor drive faulted");
+      delay(200);
+      drive.clearFault();
+    }
 
     if(reportData.killRequested) {
       drive.setMRSpeed(0);

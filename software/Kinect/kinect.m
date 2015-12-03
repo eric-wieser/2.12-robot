@@ -74,6 +74,8 @@ lines = houghlines(mask,theta,rho,P,'FillGap',5,'MinLength',7);
 figure;
 imshow(im_color), hold on
 distance_mask=zeros([rowim,columnim]);
+points_xy=zeros([rowim,columnim]);
+nb_points = 0;
 
 for k = 1:length(lines)
     xy = [lines(k).point1; lines(k).point2];
@@ -81,15 +83,21 @@ for k = 1:length(lines)
     if angle > 30
         break;
     else
+        nb_points = nb_points + 1;
         plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');
         plot(xy(1,1),xy(1,2),'x','LineWidth',2,'Color','yellow');
         plot(xy(2,1),xy(2,2),'x','LineWidth',2,'Color','red');
         distance_mask(xy(1,2),xy(1,1))=1;
         distance_mask(xy(2,2),xy(2,1))=1;
+        points_xy(xy(1,2),xy(1,1))=1;
+        nb_points = nb_points+1;
+        points_xy(xy(2,2),xy(2,1))=1;
         for i=1:3
             abscisse= round(xy(1,2)+0.25*i*(xy(2,2)-xy(1,2)));
             ordonnee= round(xy(1,1)+0.25*(xy(2,1)-xy(1,1)));
             distance_mask(abscisse,ordonnee)=1;
+            nb_points = nb_points+1;
+            points_xy(abscisse,ordonnee)=1;
         end
     end
 end
@@ -104,4 +112,21 @@ reshaped_depth=reshape(im_depth2(:,:,:),[],1);
 distance_depth=reshaped_depth(col_depth,:);
 move=mean(distance_depth)
 
+% Find angle of tree
+reshaped_mask_angle=reshape(points_xy,[],1);
+col_depth_angle=find(reshaped_mask_angle);
 
+reshaped_depth_angle=reshape(im_depth2(:,:,:),[],1);
+distance_depth_angle=reshaped_depth_angle(col_depth_angle,:);
+
+alpha = 57*pi/2*180;
+
+normd=zero([1,nb_points]);
+
+for i=1:nb_points
+    normd(i) = sqrt(points_xy(1,i)^2+(240/tan(alpha)));
+end
+
+points = [points_xy(1)*distance_depth_angle/normd,rowim*distance_depth_angle/(2*tan(alpha)*normd)];
+linear_reg=fitlm(points);
+% angle = atan2(points(); using linear_reg
