@@ -1,3 +1,4 @@
+clear d;
 d = DynamixelConn(7, 4);
 rail = Rail(d);
 
