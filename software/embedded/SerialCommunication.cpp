@@ -58,6 +58,9 @@ void SerialCommunication::receiveSerialData() {
     else if (type == 'K') {
       killRequested = true;
     }
+    else if (type == '?') {
+      Serial.println("!");
+    }
     else {
       Serial.print("Unimplemented command type '");
       Serial.print(type);

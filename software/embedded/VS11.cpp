@@ -1,8 +1,9 @@
 #include "VS11.h"
 #include "Arduino.h"
 
-VS11::VS11() {
+VS11::VS11(int pin) {
 	// configure timers and PWM here
+	Servo::attach(pin);
 }
 
 void VS11::setGoal(float goal) {

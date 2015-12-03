@@ -2,12 +2,25 @@ classdef Arduino < handle
 	properties
 		conn
 		incompleteLine
-		unparsedPackets
+		timerHandle
 	end
+	events
+		PacketsArrived
+    end
 	methods
 		function obj = Arduino(comPort)
 			obj.conn = serial(comPort);
 			obj.conn.BaudRate = 115200;
+			
+			% set up events
+			
+			obj.timerHandle = timer(...
+				'StartDelay',0.05,...
+				'Period', 0.05,...
+				'ExecutionMode', 'fixedDelay',...
+				'TimerFcn', @obj.recv_packets);
+			start(obj.timerHandle);
+			
 			fopen(obj.conn);
 			display('Successfully connected to Arduino over Serial!');
 
@@ -18,8 +31,8 @@ classdef Arduino < handle
 			flushinput(obj.conn);
 
 			obj.incompleteLine = '';
-			obj.unparsedPackets = {};
 		end
+		
 		function send_packet(obj, packet)
 			% send a packet to the arduino
 
@@ -49,14 +62,16 @@ classdef Arduino < handle
 				case 'kill'
 					fwrite(obj.conn, 'K');
 					fwrite(obj.conn, '\n');
+				case 'ping'
+					fwrite(obj.conn, '?');
+					fwrite(obj.conn, '\n');
 				otherwise
 					MException('arduino:encode:unkn', 'Unknown packet type').throw;
 			end
-		end
-
-		function packet = recv_packet(obj)
-			% recieve a packet from the arduino. If there is no pending packet
-			% then return [], which can be tested for with isempty
+		end		
+		
+		function recv_packets(obj, ~, ~)
+			% recieve a packet from the arduino.
 
 			available = obj.conn.BytesAvailable;
 			if available > 0
@@ -69,24 +84,26 @@ classdef Arduino < handle
 				% the last line is incomplete
 				obj.incompleteLine = parts{end};
 				
-				% if we completed any lines, add them to the end of our queue
-				obj.unparsedPackets = [obj.unparsedPackets parts(1:end-1)];
+				% process packets
+				packets = {};
+				for part = parts(1:end-1)
+					part = part{1};
+					packets = [packets {obj.decode_packet(part)}];
+				end
+				obj.onPacketsParsed(packets);
 			end
-
-			% if the queue is empty, we have no packet to return
-			if isempty(obj.unparsedPackets)
-				packet = [];
-				return
-			end
-
-			% otherwise, pop the queue
-			serialData = obj.unparsedPackets{1};
-			obj.unparsedPackets = obj.unparsedPackets(2:end);
-
-			% and decode
-			packet = obj.decode_packet(serialData);
 		end
 
+		function delete(obj)
+			% close the serial connection
+			disp('Stopping motors');
+			obj.send_packet(struct('type', 'kill'));
+			fclose(obj.conn);
+			delete(obj.conn);
+		end
+	end
+	
+	methods (Access=private)
 		function packet = decode_packet(~, serialData)
 			contents = serialData(2:end);
 			switch serialData(1)
@@ -113,6 +130,10 @@ classdef Arduino < handle
 					packet = struct();
 					packet.type = 'debug';
 					packet.message = contents;
+				case '!'
+					% pong packet
+					packet = struct();
+					packet.type = 'pong';
 				otherwise
 					% unprefixed packet - assume debug
 					packet = struct();
@@ -121,12 +142,14 @@ classdef Arduino < handle
 			end
 		end
 
-		function delete(obj)
-			% close the serial connection
-			disp('Stopping motors');
-			obj.send_packet(struct('type', 'kill'));
-			fclose(obj.conn);
-			delete(obj.conn);
+		function onPacketsParsed(obj, packets)
+			notify(obj, 'PacketsArrived', ArduinoPacketEventData(packets));
+			for p = packets
+				p = p{1};
+				if strcmp(p.type, 'debug')
+					disp(['Debug message:', p.message]);
+				end
+			end
 		end
 	end
 end

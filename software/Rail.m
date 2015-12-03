@@ -6,8 +6,8 @@ classdef Rail < handle
         left
         right
         
-        init_pos_right = -15803;
-        init_pos_left = 1102;
+        init_pos_right = 46117;
+        init_pos_left = 3995;
     end
     
     methods
