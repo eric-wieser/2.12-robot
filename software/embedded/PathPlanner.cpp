@@ -42,7 +42,7 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
       turnBegin = robotPos.Phi;
 
       if(reportData.commandIsTurn) {
-        turnEnd = commandPhi;
+        turnEnd = reportData.commandPhi;
       }
       else {
         Vector dist = reportData.commandPos - robotPos.pos;

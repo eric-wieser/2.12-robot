@@ -18,6 +18,7 @@ and delete the contents of loop()
 #include "SerialCommunication.h"
 #include "PathPlanner.h"
 #include "constants.h"
+#include "VS11.h"
 
 /**
 Tests that the motors are wired up correctly.
