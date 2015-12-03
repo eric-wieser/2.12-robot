@@ -112,11 +112,14 @@ classdef Arduino < handle
 		end
 
 		function delete(obj)
+			stop(obj.timerHandle);
+			delete(obj.timerHandle);
 			% close the serial connection
 			disp('Stopping motors');
 			obj.send_packet(struct('type', 'kill'));
 			fclose(obj.conn);
 			delete(obj.conn);
+			
 		end
 	end
 
