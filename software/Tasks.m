@@ -30,15 +30,38 @@ classdef Tasks < handle
         end
         
         function tasktwo = tree()
-        tree_x = 0;
-        tree_y = 0;
+        kinect_offset = 0.65;
+
+        %move to get close to tree
+        start_point = gps.read();
+        step1_x = 1.25;
+        step1_y = start_point(2);
+        nav.gpsFeedbackNav(gps, step1_x, step1_y);
+
+        %call kinect
+        move=kinect();
+        step2_x = step1_x-move+kinect_offset;
+        step2_y = step1_y;
+        nav.gpsFeedbackNav(gps, step2_x, step2_y);
+
+        %Lift sifter
+        rail.raise();
+
+        %go to step 3
+        step3_x = step2_x;
+        step3_y = 0;
+        nav.gpsFeedbackNav(gps, step3_x, step3_y);
+
+        % clear tree
+        rail.dumpSnow(); 
 
         obj.nav.gpsFeedbackNav(obj.gps, tree_x, tree_y);
 
-        arm.outoftheway();
-        rail.raise();
-        rail.dumpSnow(); 
-        rail.wiggle();
+%         arm.outoftheway();
+%         rail.raise();
+%         rail.dumpSnow(); 
+%         rail.wiggle();
+
         % typing clear all should stop motors etc from failing
         end
         
