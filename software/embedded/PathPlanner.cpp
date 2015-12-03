@@ -18,6 +18,8 @@ bool PathPlanner::OrientationController(const RobotPosition & robotPos, const Se
   float KPhi = .50;
 
   Vector delta = reportData.commandPos - robotPos.pos;
+  if(reportData.commandIsReversed) delta = -delta;
+
   Angle phiGoal = delta.angle();
   float phiError = phiGoal - robotPos.Phi;
 
@@ -49,7 +51,8 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
 
         // skip small movements
         if(dist.magnitudeSq() < 0.025*0.025) currentTask = Task::DONE;
-        turnEnd = dist.angle();
+
+        turnEnd = (reportData.commandIsReversed ? -dist : dist).angle();
       }
     }
   }
@@ -90,6 +93,10 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
       //if we aren't there yet, keep going
       desiredMVR = speed;
       desiredMVL = speed;
+      if(reportData.commandIsReversed) {
+        desiredMVR = -desiredMVR;
+        desiredMVL = -desiredMVL;
+      }
       bool done = OrientationController(robotPos, reportData);
       if(done) currentTask = Task::DONE;
     } else {

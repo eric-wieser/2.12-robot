@@ -38,8 +38,16 @@ classdef Arduino < handle
 			% send a packet to the arduino
 
 			switch packet.type
-				case 'dest'
-					fwrite(obj.conn, 'D');
+				case 'fwd'
+					fwrite(obj.conn, 'F');
+					fwrite(obj.conn, num2str(packet.cid));
+					fwrite(obj.conn, ',');
+					fwrite(obj.conn, num2str(packet.x));
+					fwrite(obj.conn, ',');
+					fwrite(obj.conn, num2str(packet.y));
+					fwrite(obj.conn, '\n');
+				case 'rev'
+					fwrite(obj.conn, 'R');
 					fwrite(obj.conn, num2str(packet.cid));
 					fwrite(obj.conn, ',');
 					fwrite(obj.conn, num2str(packet.x));
@@ -104,11 +112,14 @@ classdef Arduino < handle
 		end
 
 		function delete(obj)
+			stop(obj.timerHandle);
+			delete(obj.timerHandle);
 			% close the serial connection
 			disp('Stopping motors');
 			obj.send_packet(struct('type', 'kill'));
 			fclose(obj.conn);
 			delete(obj.conn);
+			
 		end
 	end
 
