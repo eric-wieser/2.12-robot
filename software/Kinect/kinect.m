@@ -28,14 +28,7 @@ imwrite(im_depth,'depth_125cm_2.png');
 
 %Stop
 stop([colorVid depthVid]);
-disp('...Done!');
-
-% View captured images
-% figure(1)
-% subplot(1,2,1)
-% imshow(im_color);
-% subplot(1,2,2)
-% imshow(im_depth, []);
+disp('Picture taken!');
 
 %% Perform object detection
 
@@ -80,9 +73,7 @@ nb_points = 0;
 for k = 1:length(lines)
     xy = [lines(k).point1; lines(k).point2];
     angle = atan2(xy(2,2)-xy(1,2),xy(2,1)-xy(1,1))*180/pi;
-    if angle > 30
-        break;
-    else
+    if angle < 30
         nb_points = nb_points + 1;
         plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');
         plot(xy(1,1),xy(1,2),'x','LineWidth',2,'Color','yellow');
@@ -94,13 +85,17 @@ for k = 1:length(lines)
         points_xy(xy(2,2),xy(2,1))=1;
         for i=1:3
             abscisse= round(xy(1,2)+0.25*i*(xy(2,2)-xy(1,2)));
-            ordonnee= round(xy(1,1)+0.25*(xy(2,1)-xy(1,1)));
+            ordonnee= round(xy(1,1)+0.25*i*(xy(2,1)-xy(1,1)));
             distance_mask(abscisse,ordonnee)=1;
             nb_points = nb_points+1;
             points_xy(abscisse,ordonnee)=1;
         end
     end
 end
+
+points_array = zeros([2,nb_points]);
+normd=zeros([1,nb_points]);
+points=zeros([nb_points,2]);
 
 % Find distance
 figure;
@@ -112,7 +107,28 @@ reshaped_depth=reshape(im_depth2(:,:,:),[],1);
 distance_depth=reshaped_depth(col_depth,:);
 move=mean(distance_depth)
 
-% Find angle of tree
+%Find angle
+nb_points_2=0;
+for k = 1:length(lines)
+    xy = [lines(k).point1; lines(k).point2];
+    angle = atan2(xy(2,2)-xy(1,2),xy(2,1)-xy(1,1))*180/pi;
+    if angle < 30
+        nb_points_2 = nb_points_2 + 1;
+        points_array(1,nb_points_2)=xy(1,2);
+        points_array(2,nb_points_2)=xy(1,1);
+        nb_points_2 = nb_points_2+1;
+        points_array(1,nb_points_2)=xy(2,2);
+        points_array(2,nb_points_2)=xy(2,1);
+        for i=1:3
+            abscisse= round(xy(1,2)+0.25*i*(xy(2,2)-xy(1,2)));
+            ordonnee= round(xy(1,1)+0.25*i*(xy(2,1)-xy(1,1)));
+            nb_points_2 = nb_points_2+1;
+            points_array(1,nb_points_2)=abscisse;
+            points_array(2,nb_points_2)=ordonnee;
+        end
+    end
+end
+
 reshaped_mask_angle=reshape(points_xy,[],1);
 col_depth_angle=find(reshaped_mask_angle);
 
@@ -121,12 +137,14 @@ distance_depth_angle=reshaped_depth_angle(col_depth_angle,:);
 
 alpha = 57*pi/2*180;
 
-normd=zero([1,nb_points]);
-
 for i=1:nb_points
-    normd(i) = sqrt(points_xy(1,i)^2+(240/tan(alpha)));
+    normd(i) = sqrt(points_array(1,i)*points_array(1,i)/4+(rowim/(2*tan(alpha)))*(rowim/(2*tan(alpha))));
 end
 
-points = [points_xy(1)*distance_depth_angle/normd,rowim*distance_depth_angle/(2*tan(alpha)*normd)];
-linear_reg=fitlm(points);
-% angle = atan2(points(); using linear_reg
+for i=1:nb_points
+    points(i,1) = points_array(1,i)*distance_depth_angle(i,1)/normd(i);
+    points(i,2) = rowim*distance_depth_angle(i,1)/(2*tan(alpha)*normd(i));
+end
+
+linear_reg=fit(points(:,1),points(:,2),'linear');
+angle = linear_reg.Coefficients.Estimate(1);
