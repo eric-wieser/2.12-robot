@@ -85,9 +85,8 @@ classdef Navigator < handle
         
         function gpsFeedbackNav(obj, GPS, x, y)
             pos = GPS.read();
-            obj.overridePose();
-            
-            obj.forwardTo(x,y);
+            obj.overridePose(pos.x, pos.y, pos.phi);            
+            obj.fwdTo(x,y);
             pos = GPS.read();
             obj.overridePose(pos.x, pos.y, pos.phi);
             obj.goTo(x,y);        
