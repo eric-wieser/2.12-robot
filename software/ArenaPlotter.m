@@ -39,7 +39,7 @@ classdef ArenaPlotter < handle
 		end
 		
 		function update(obj, ~, ~)
-			sfigure(obj.fig_handle);
+            set(0, 'CurrentFigure', obj.fig_handle);
 			cla;
 			hold on;
 			
