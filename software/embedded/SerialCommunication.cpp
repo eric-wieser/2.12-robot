@@ -8,6 +8,7 @@ SerialCommunication::SerialCommunication() {
   finished = true;
   gpsData.received = 0;
   cmdId = 0;
+  servoGoal = 0;
 }
 
 void SerialCommunication::sendSerialData(const RobotPosition & robotPos) {
