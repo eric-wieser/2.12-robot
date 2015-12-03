@@ -3,7 +3,7 @@ clear arduino;
 delete(instrfindall);
 
 try
-	arduino = Arduino('COM8');  % Use Arduino IDE to see which com port the Arduino UNO is using
+	arduino = Arduino('COM9');  % Use Arduino IDE to see which com port the Arduino UNO is using
 catch e
 	switch e.identifier
 		case 'MATLAB:serial:fopen:opfailed'
@@ -14,12 +14,13 @@ catch e
 	end
 end
 
-dynamixel_conn = DynamixelConn(7, 4);
-rail = Rail(d);
-
 nav = Navigator(arduino);
+nav.overridePoses(1.3, -1, pi/2)
+
 plotter = ArenaPlotter(arduino);
 
+dynamixel_conn = DynamixelConn(7, 4);
+rail = Rail(dynamixel_conn);
 arm = Arm(dynamixel_conn, arduino);
 
 % TODO - all the things
