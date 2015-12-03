@@ -43,7 +43,12 @@ void SerialCommunication::receiveSerialData() {
     if(type == 'D') {
       commandPos.x = command[0];
       commandPos.y = command[1];
-      commandPhi = command[2];
+      commandIsTurn = false;
+      updateStatus(false);
+    }
+    if(type == 'T') {
+      commandPhi = command[0];
+      commandIsTurn = true;
       updateStatus(false);
     }
     else if(type == 'G') {
