@@ -40,12 +40,16 @@ classdef Arduino < handle
 			switch packet.type
 				case 'dest'
 					fwrite(obj.conn, 'D');
+					fwrite(obj.conn, num2str(packet.cid));
+					fwrite(obj.conn, ',');
 					fwrite(obj.conn, num2str(packet.x));
 					fwrite(obj.conn, ',');
 					fwrite(obj.conn, num2str(packet.y));
 					fwrite(obj.conn, '\n');
 				case 'turn'
 					fwrite(obj.conn, 'T');
+					fwrite(obj.conn, num2str(packet.cid));
+					fwrite(obj.conn, ',');
 					fwrite(obj.conn, num2str(packet.phi));
 					fwrite(obj.conn, '\n');
 				case 'gps'
@@ -123,6 +127,7 @@ classdef Arduino < handle
 					packet.y = str2double(splitData(2));
 					packet.phi = str2double(splitData(3));
 					packet.status = str2double(splitData(4));
+					packet.cid = str2double(splitData(5));
 				case 'E'
 					% error packet
 					packet = struct();

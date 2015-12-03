@@ -7,6 +7,7 @@ SerialCommunication::SerialCommunication() {
   prevSerialTime = micros();
   finished = true;
   gpsData.received = 0;
+  cmdId = 0;
 }
 
 void SerialCommunication::sendSerialData(const RobotPosition & robotPos) {
@@ -18,7 +19,9 @@ void SerialCommunication::sendSerialData(const RobotPosition & robotPos) {
     Serial.print(",");
     Serial.print(float(robotPos.Phi)); //Phi
     Serial.print(",");
-    Serial.println(finished ? 1 : 0);
+    Serial.print(finished ? 0 : 1); //Phi
+    Serial.print(",");
+    Serial.println(cmdId);
     prevSerialTime = micros();
   }
 }
@@ -41,13 +44,15 @@ void SerialCommunication::receiveSerialData() {
 
 
     if(type == 'D') {
-      commandPos.x = command[0];
-      commandPos.y = command[1];
+      cmdId = command[0];
+      commandPos.x = command[1];
+      commandPos.y = command[2];
       commandIsTurn = false;
       updateStatus(false);
     }
     else if(type == 'T') {
-      commandPhi = command[0];
+      cmdId = command[0];
+      commandPhi = command[1];
       commandIsTurn = true;
       updateStatus(false);
     }
