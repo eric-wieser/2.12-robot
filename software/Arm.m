@@ -33,12 +33,12 @@ classdef Arm < handle
             a = 5;
             tic;
             while toc < 20
-                x = 10 + a*cos(f*toc);
-                y = 30 + a*sin(f*toc);               
+                x = 10 - a*toc;
+                y = 30 + a*.5*toc;               
                 [theta1, theta2] = obj.findThetas(x,y);
                 obj.shoulder.GoalPosition = obj.rad2value(theta1);
                 obj.elbow.GoalPosition = obj.rad2value(theta2);
-                obj.setHandTarget(2*pi-theta1-theta2);
+                %%obj.setHandTarget(2*pi-theta1-theta2);
             end
         end
 
@@ -51,9 +51,16 @@ classdef Arm < handle
                 [theta1, theta2] = obj.findThetas(x,y);
                 obj.shoulder.GoalPosition = obj.rad2value(theta1);
                 obj.elbow.GoalPosition = obj.rad2value(theta2);
-                obj.setHandTarget(2*pi-theta1-theta2);
+                %%obj.setHandTarget(2*pi-theta1-theta2);
             end
         end
+        
+        function outoftheway(obj)
+            x = -10;
+            y = 50;               
+            [theta1, theta2] = obj.findThetas(x,y);
+            obj.shoulder.GoalPosition = obj.rad2value(theta1);
+            obj.elbow.GoalPosition = obj.rad2value(theta2);
         
         function [theta1, theta2] = findThetas(obj, x, y)
             hyp = sqrt(x^2 + y^2);

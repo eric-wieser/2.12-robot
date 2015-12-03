@@ -70,7 +70,17 @@ classdef Navigator < handle
 				'phi', phi, ...
 				'timestamp', -1 ...
 			));
-		end
+        end
+        
+        function gpsFeedbackNav(obj, GPS, x, y)
+            pos = GPS.read();
+            ERROR = .1;
+
+            while (((pos.x || pos.y) < x+ERROR) || ((pos.x || pos.y) > y - ERROR))
+                nav.goTo(x,y);
+                pos = gps.read();
+                nav.overridePose(pos.x, pos.y, pos.phi);
+            end;
 	end
 
 end
