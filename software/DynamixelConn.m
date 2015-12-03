@@ -44,8 +44,7 @@ classdef DynamixelConn < handle
 			stat = calllib('dynamixel','dxl_get_result');
 			if stat ~= obj.COMM_RXSUCCESS
 				error('dynamixel:io', ['Error during ping: ' DynamixelConn.comm_names{stat+1}]);
-			end
-			obj.error_check();
+            end
 		end
 
 		function res = read_word(obj, id, reg)
@@ -53,8 +52,7 @@ classdef DynamixelConn < handle
 			stat = calllib('dynamixel','dxl_get_result');
 			if stat ~= DynamixelConn.COMM_RXSUCCESS
 				error('dynamixel:io', ['Error during read_word: ' DynamixelConn.comm_names{stat+1}]);
-			end
-			obj.error_check();
+            end
 		end
 
 		function write_word(obj, id, reg, value)
@@ -62,8 +60,7 @@ classdef DynamixelConn < handle
 			stat = calllib('dynamixel','dxl_get_result');
 			if stat ~= DynamixelConn.COMM_RXSUCCESS
 				error('dynamixel:io', ['Error during write_word: ' DynamixelConn.comm_names{stat+1}]);
-			end
-			obj.error_check();
+            end
 		end
 
 		function res = read_byte(obj, id, reg)
@@ -79,8 +76,7 @@ classdef DynamixelConn < handle
 			stat = calllib('dynamixel','dxl_get_result');
 			if stat ~= DynamixelConn.COMM_RXSUCCESS
 				error('dynamixel:io', ['Error during write_byte: ' DynamixelConn.comm_names{stat+1}]);
-			end
-			obj.error_check();
+            end
 		end
 
 		function delete(obj)
@@ -90,14 +86,13 @@ classdef DynamixelConn < handle
 
 		function m = mxmotor(obj, id)
 			m = DynamixelMX(obj, id);
-		end
-	end
-
-	methods(Access=private)
-		function error_check(obj)
+        end
+        
+		function errors = get_errors(obj)
 			error_bit = @(bit) calllib('dynamixel', 'dxl_get_rxpacket_error', bit) == 1;
 
-			errors = {};
+			errors = struct(...
+                'InputVoltage', ;
 			if error_bit(DynamixelConn.ERRBIT_VOLTAGE)
 				errors = [errors {'Input voltage'}];
 			end
@@ -118,11 +113,7 @@ classdef DynamixelConn < handle
 			end
 			if error_bit(DynamixelConn.ERRBIT_INSTRUCTION)
 				errors = [errors {'Instruction code'}];
-			end
-
-			if ~empty(errors)
-				error(['dynamixel:fault', 'Dynamixel reported one or more errors: ' strjoin(errors, ', ')])
-			end
+            end
 		end
 	end
 end
