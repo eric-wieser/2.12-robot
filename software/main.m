@@ -15,19 +15,24 @@ catch e
 end
 
 dynamixel_conn = DynamixelConn(7, 4);
-%%rail = Rail(dynamixel_conn);
+rail = Rail(dynamixel_conn);
 
 nav = Navigator(arduino);
 plotter = ArenaPlotter(arduino);
 
+disp('connected to nav');
 %arm = Arm(dynamixel_conn, arduino);
 
-gps= GPS('192.168.1.121');
+gpsON= false;
+if (gpsON)
+    gps= GPS('192.168.1.121');
+    tasks = Tasks(nav, gps, rail);
+else
+    gps = [];
+    tasks = Tasks(nav, gps, rail);
+end
 
-
-
-tasks = Tasks(nav, gps);
-
+%%
 tasks.mt_simmons();
 tasks.tree();
 tasks.roof();

@@ -84,12 +84,23 @@ classdef Navigator < handle
         end
         
         function gpsFeedbackNav(obj, GPS, x, y)
-            pos = GPS.read();
-            obj.overridePose(pos.x, pos.y, pos.phi);            
+            
+            obj.fwdTo(x,y)
+%             
+%             if isempty(GPS) obj.fwdTo(x,y)
+%              
+%             else pos = GPS.read();            
+%             obj.overridePose(pos.x, pos.y, pos.phi);            
+%             obj.fwdTo(x,y);
+%             pause(.05);
+%             pos = GPS.read();
+%             obj.overridePose(pos.x, pos.y, pos.phi);
+%             obj.fwdTo(x,y);
+%             end
+        end
+        
+        function feedbackNav(obj, x, y)
             obj.fwdTo(x,y);
-            pos = GPS.read();
-            obj.overridePose(pos.x, pos.y, pos.phi);
-            obj.goTo(x,y);        
         end
 	end
 
