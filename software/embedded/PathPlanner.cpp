@@ -13,12 +13,6 @@ PathPlanner::PathPlanner() {
   desiredMVR = 0;
 }
 
-void PathPlanner::computeDesiredV(float forwardVel, float K) {
-  //command velocities based off of K and average forwardVel
-  desiredMVR = forwardVel * (1 + K * b);
-  desiredMVL = forwardVel * (1 - K * b);
-}
-
 bool PathPlanner::OrientationController(const RobotPosition & robotPos, const SerialCommunication & reportData) {
   const float eps = .01;
   float KPhi = .50;

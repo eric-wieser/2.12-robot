@@ -33,9 +33,6 @@ class PathPlanner {
     float desiredMVR;
     PathPlanner();
 
-    /** update desiredMVL and desiredMVR to match a given curvature and velocity */
-    void computeDesiredV(float forwardVel, float K);
-
     /**
     update desiredMVL and desiredMVR to drive to the goal location
     this happens in two steps:
