@@ -26,7 +26,7 @@ public:
 	}
 
 	bool clearFault() {
-		md.init();
+		md.clearFault();
 	}
 
 	Drive() {
