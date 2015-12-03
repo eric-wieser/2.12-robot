@@ -44,11 +44,20 @@ void SerialCommunication::receiveSerialData() {
     }
 
 
-    if(type == 'D') {
+    if(type == 'F') {
       cmdId = command[0];
       commandPos.x = command[1];
       commandPos.y = command[2];
       commandIsTurn = false;
+      commandIsReversed = false;
+      updateStatus(false);
+    }
+    if(type == 'R') {
+      cmdId = command[0];
+      commandPos.x = command[1];
+      commandPos.y = command[2];
+      commandIsTurn = false;
+      commandIsReversed = true;
       updateStatus(false);
     }
     else if(type == 'T') {
