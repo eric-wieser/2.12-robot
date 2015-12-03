@@ -32,7 +32,7 @@ void Main::loop() {
       Serial.print("Updated from the GPS data");
     }
 
-    handServo.setGoal(reportData.servoGoal);
+    // handServo.setGoal(reportData.servoGoal);
 
     reportData.sendSerialData(robotPos); //report data to matlab via serial communication
     reportData.receiveSerialData();

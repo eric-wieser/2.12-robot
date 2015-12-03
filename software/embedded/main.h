@@ -23,7 +23,7 @@ private:
   SerialCommunication reportData;
   PathPlanner pathPlanner;
 
-  VS11 handServo;
+  // VS11 handServo;
 
   uint32_t prevTime;
 };
