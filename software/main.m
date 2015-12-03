@@ -24,36 +24,10 @@ plotter = ArenaPlotter(arduino);
 
 gps= GPS('192.168.1.121');
 
-% TODO - all the things
 
-%% Task One -- Mount Simmons
-mt_simmons_x = 1.25;
-mt_simmons_y = .5;
 
-nav.gpsFeedbackNav(gps, mt_simmons_x, mt_simmons_y);
+tasks = Tasks(nav, gps);
 
-% arm.sweepSnow();
-% arm.outoftheway();
-% rail.dumpSnow();
-% rail.wiggle();
-% rail.dumpDebris();
-% rail.wiggle();
-%% Task 2 -- Pick Up Tree
-tree_x = 0;
-tree_y = 0;
-
-nav.gpsFeedbackNav(gps, tree_x, tree_y);
-
-arm.outoftheway();
-rail.raise();
-rail.dumpSnow(); 
-rail.wiggle();
-% typing clear all should stop motors etc from failing
-
-%%Task 3 -- Rescue house
-house_x = 0;
-house_y = 0;
-
-nav.gpsFeedbackNav(gps, house_x, house_y);
-rail.lower();
-arm.sweepRoof();
+tasks.mt_simmons();
+tasks.tree();
+tasks.roof();
