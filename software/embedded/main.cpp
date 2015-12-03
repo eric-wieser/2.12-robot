@@ -44,6 +44,12 @@ void Main::loop() {
     moveRobot.controlML(pathPlanner.desiredMVL, measureRobot.mVL); //left motor PI control
     prevTime = currentTime; //update timer
 
+    if(drive.faulted()) {
+      Serial.println("Motor drive faulted");
+      delay(200);
+      drive.clearFault();
+    }
+
     if(reportData.killRequested) {
       drive.setMRSpeed(0);
       drive.setMLSpeed(0);
