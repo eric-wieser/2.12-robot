@@ -7,7 +7,7 @@ classdef Rail < handle
         right
         
         top_height = 7880;
-        max_diff = 1880;
+        max_diff = 2080;
     end
     
     methods
@@ -40,8 +40,10 @@ classdef Rail < handle
         end
         
         function obj = setOrigin(obj)
-            obj.left.MultiTurnOffset = obj.left.MultiTurnOffset - obj.left.PresentPosition;
-            obj.right.MultiTurnOffset = obj.right.MultiTurnOffset - obj.right.PresentPosition;
+			obj.left.MultiTurnOffset = 0;
+			obj.right.MultiTurnOffset = 0;
+            obj.left.MultiTurnOffset = -obj.left.PresentPosition;
+            obj.right.MultiTurnOffset = -obj.right.PresentPosition;
         end
         
         function raiseRel(obj, amt)
