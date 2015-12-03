@@ -49,6 +49,9 @@ classdef Arduino < handle
 				case 'kill'
 					fwrite(obj.conn, 'K');
 					fwrite(obj.conn, '\n');
+				case 'ping'
+					fwrite(obj.conn, '?');
+					fwrite(obj.conn, '\n');
 				otherwise
 					MException('arduino:encode:unkn', 'Unknown packet type').throw;
 			end
@@ -113,6 +116,10 @@ classdef Arduino < handle
 					packet = struct();
 					packet.type = 'debug';
 					packet.message = contents;
+				case '!'
+					% pong packet
+					packet = struct();
+					packet.type = 'pong';
 				otherwise
 					% unprefixed packet - assume debug
 					packet = struct();
