@@ -28,9 +28,22 @@ classdef Rail < handle
             left.ResolutionDivider = 4;
         end
         
-        function setPoses(obj, pos)
+        function setPoses(obj, pos, no_block)
             obj.right.GoalPosition = pos(1);
             obj.left.GoalPosition = - pos(2);
+			
+			if nargin == 3 && no_block
+				return
+			end
+		
+			tic
+			while toc < 10
+				left_done = abs(obj.left.GoalPosition - obj.left.PresentPosition) < 20;
+				right_done = abs(obj.right.GoalPosition - obj.right.PresentPosition) < 20;
+				if left_done && right_done
+					return
+				end
+			end
         end
         function pos = getPoses(obj)
             pos = [
@@ -58,10 +71,14 @@ classdef Rail < handle
         
         % high level commands
         function lower(obj)
+			at = obj.getPoses();
+            obj.setPoses(at / 2);
             obj.setPoses([0; 0]);
         end
         function raise(obj)
-            obj.setPoses([obj.top_height; obj.top_height]);
+			target = [obj.top_height; obj.top_height];
+            obj.setPoses(target / 2);
+            obj.setPoses(target);
         end
         function dumpSnow(obj)
             obj.setPoses([obj.top_height - obj.max_diff; obj.top_height]);
@@ -77,13 +94,13 @@ classdef Rail < handle
             size = 50;
             delay = 0.05;
             for i=1:n
-                obj.setPoses(pos + size * [1;1]);
+                obj.setPoses(pos + size * [1;1], true);
                 pause(delay);
-                obj.setPoses(pos + size * [1;-1]);
+                obj.setPoses(pos + size * [1;-1], true);
                 pause(delay);
-                obj.setPoses(pos + size * [-1;-1]);
+                obj.setPoses(pos + size * [-1;-1], true);
                 pause(delay);
-                obj.setPoses(pos + size * [-1;1]);
+                obj.setPoses(pos + size * [-1;1], true);
                 pause(delay);
             end
         end

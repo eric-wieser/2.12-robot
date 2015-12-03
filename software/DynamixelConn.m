@@ -48,7 +48,7 @@ classdef DynamixelConn < handle
 		end
 
 		function res = read_word(obj, id, reg)
-			res = calllib('dynamixel','dxl_read_word', id, reg);
+			res = int32(calllib('dynamixel','dxl_read_word', id, reg));
 			stat = calllib('dynamixel','dxl_get_result');
 			if stat ~= DynamixelConn.COMM_RXSUCCESS
 				error('dynamixel:io', ['Error during read_word: ' DynamixelConn.comm_names{stat+1}]);
@@ -56,7 +56,7 @@ classdef DynamixelConn < handle
 		end
 
 		function write_word(obj, id, reg, value)
-			calllib('dynamixel','dxl_write_word', id, reg, value);
+			calllib('dynamixel','dxl_write_word', id, reg, typecast(int16(value), 'uint16'));
 			stat = calllib('dynamixel','dxl_get_result');
 			if stat ~= DynamixelConn.COMM_RXSUCCESS
 				error('dynamixel:io', ['Error during write_word: ' DynamixelConn.comm_names{stat+1}]);
