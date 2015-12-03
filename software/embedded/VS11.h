@@ -1,11 +1,10 @@
 #pragma once
 
-class VS11 {
+#include <Servo.h>
+
+class VS11 : private Servo {
 public:
-	VS11();
+	VS11(int pin=5);
 
 	void setGoal(float goal);
-
-private:
-	int servoPin = 0;  // TODO
-}
+};
