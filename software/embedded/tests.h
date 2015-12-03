@@ -4,4 +4,5 @@ namespace tests {
 	void motor_feedback();
 	void measurements();
 	void servo();
+	void servo_drive_interaction();
 }

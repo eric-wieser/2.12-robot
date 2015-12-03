@@ -180,7 +180,7 @@ void tests::motor_feedback() {
 
 
 void tests::servo() {
-	VS11 servo;
+	VS11 servo(3);
 
 	servo.setGoal(0);
 	delay(500);
@@ -193,4 +193,30 @@ void tests::servo() {
 	Serial.println("0");
 	servo.setGoal(0);
 
+}
+
+void tests::servo_drive_interaction() {
+	VS11 servo(3);
+
+	servo.setGoal(0);
+	delay(1000);
+	servo.setGoal(M_PI/2);
+	delay(1000);
+	Serial.println("0");
+
+	{
+		Drive d;
+		d.setMLSpeed(100);
+		d.setMRSpeed(100);
+		delay(1000);
+		servo.setGoal(0);
+		delay(1000);
+		d.setMLSpeed(-100);
+		d.setMRSpeed(-100);
+		delay(1000);
+		servo.setGoal(M_PI/2);
+		delay(1000);
+		d.setMLSpeed(0);
+		d.setMRSpeed(0);
+	}
 }
