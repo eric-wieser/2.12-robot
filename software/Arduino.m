@@ -14,12 +14,6 @@ classdef Arduino < handle
 
 			% set up events
 
-			obj.timerHandle = timer(...
-				'StartDelay',0.05,...
-				'Period', 0.05,...
-				'ExecutionMode', 'fixedDelay',...
-				'TimerFcn', @obj.recv_packets);
-			start(obj.timerHandle);
 
 			fopen(obj.conn);
 			display('Successfully connected to Arduino over Serial!');
@@ -31,6 +25,13 @@ classdef Arduino < handle
 			flushinput(obj.conn);
 
 			obj.incompleteLine = '';
+
+			obj.timerHandle = timer(...
+				'StartDelay',0.05,...
+				'Period', 0.05,...
+				'ExecutionMode', 'fixedDelay',...
+				'TimerFcn', @obj.recv_packets);
+			start(obj.timerHandle);
 		end
 
 		function send_packet(obj, packet)

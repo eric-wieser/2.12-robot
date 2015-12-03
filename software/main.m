@@ -1,3 +1,7 @@
+% clean up leftover arduino sessions
+clear arduino;
+delete(instrfindall);
+
 try
 	arduino = Arduino('COM8');  % Use Arduino IDE to see which com port the Arduino UNO is using
 catch e
@@ -13,6 +17,11 @@ end
 dynamixel_conn = DynamixelConn(7, 4);
 rail = Rail(d);
 
+nav = Navigator(arduino);
+plotter = ArenaPlotter(arduino);
+
 arm = Arm(dynamixel_conn, arduino);
 
-%TODO - all the things
+% TODO - all the things
+
+% typing clear all should stop motors etc from failing
