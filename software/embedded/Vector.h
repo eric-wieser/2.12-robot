@@ -15,6 +15,8 @@ public:
 	friend inline Vector operator *(float f, Vector a) { return Vector(a.x*f, a.y*f); }
 	friend inline Vector operator /(Vector a, float f) { return Vector(a.x/f, a.y/f); }
 
+	friend inline Vector operator -(Vector a) { return Vector(-a.x, -a.y); }
+
 	inline float dot(Vector b) {
 		return x*b.x + y*b.y;
 	}

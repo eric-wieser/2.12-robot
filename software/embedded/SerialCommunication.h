@@ -29,6 +29,7 @@ class SerialCommunication {
     Vector commandPos;
     float commandPhi;
     bool commandIsTurn;
+    bool commandIsReversed;
 
     uint32_t cmdId;
     bool finished;
