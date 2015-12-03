@@ -43,13 +43,14 @@ classdef Rail < handle
 				if left_done && right_done
 					return
 				end
+				pause(0.1);
 			end
         end
         function pos = getPoses(obj)
-            pos = [
+            pos = int16([
                 obj.right.PresentPosition;
                 -obj.left.PresentPosition;
-            ];
+            ]);
         end
         
         function obj = setOrigin(obj)
@@ -71,14 +72,10 @@ classdef Rail < handle
         
         % high level commands
         function lower(obj)
-			at = obj.getPoses();
-            obj.setPoses(at / 2);
             obj.setPoses([0; 0]);
         end
         function raise(obj)
-			target = [obj.top_height; obj.top_height];
-            obj.setPoses(target / 2);
-            obj.setPoses(target);
+            obj.setPoses([obj.top_height; obj.top_height]);
         end
         function dumpSnow(obj)
             obj.setPoses([obj.top_height - obj.max_diff; obj.top_height]);
