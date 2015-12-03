@@ -13,12 +13,6 @@ PathPlanner::PathPlanner() {
   desiredMVR = 0;
 }
 
-void PathPlanner::computeDesiredV(float forwardVel, float K) {
-  //command velocities based off of K and average forwardVel
-  desiredMVR = forwardVel * (1 + K * b);
-  desiredMVL = forwardVel * (1 - K * b);
-}
-
 bool PathPlanner::OrientationController(const RobotPosition & robotPos, const SerialCommunication & reportData) {
   const float eps = .01;
   float KPhi = .50;
@@ -46,11 +40,17 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
     if (!reportData.finished){
       currentTask = Task::TURN;
       turnBegin = robotPos.Phi;
-      Vector dist = reportData.commandPos - robotPos.pos;
 
-      // skip small movements
-      if(dist.magnitudeSq() < 0.025*0.025) currentTask = Task::DONE;
-      turnEnd = dist.angle();
+      if(reportData.commandIsTurn) {
+        turnEnd = reportData.commandPhi;
+      }
+      else {
+        Vector dist = reportData.commandPos - robotPos.pos;
+
+        // skip small movements
+        if(dist.magnitudeSq() < 0.025*0.025) currentTask = Task::DONE;
+        turnEnd = dist.angle();
+      }
     }
   }
 
@@ -70,6 +70,9 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
       desiredMVL = 0;
       currentTask = Task::STRAIGHT;
       pathGoal = robotPos.pathDistance + (reportData.commandPos - robotPos.pos).magnitude();
+
+      // if we're just turning, this is our last step
+      if(reportData.commandIsTurn) currentTask = Task::DONE;
     }
   }
 
@@ -97,7 +100,6 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
     desiredMVR = 0;
     desiredMVL = 0;
     currentTask = Task::IDLE;
-    lastRobotPos = robotPos;
     Serial.println("NEXT POINT");
     reportData.updateStatus(true);
   }

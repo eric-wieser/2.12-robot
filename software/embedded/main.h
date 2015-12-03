@@ -7,6 +7,7 @@
 #include "SerialCommunication.h"
 #include "PathPlanner.h"
 #include "Drive.h"
+#include "VS11.h"
 
 class Main {
 public:
@@ -21,6 +22,8 @@ private:
   MotorController moveRobot;
   SerialCommunication reportData;
   PathPlanner pathPlanner;
+
+  VS11 handServo;
 
   uint32_t prevTime;
 };

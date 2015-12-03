@@ -33,9 +33,6 @@ class PathPlanner {
     float desiredMVR;
     PathPlanner();
 
-    /** update desiredMVL and desiredMVR to match a given curvature and velocity */
-    void computeDesiredV(float forwardVel, float K);
-
     /**
     update desiredMVL and desiredMVR to drive to the goal location
     this happens in two steps:
@@ -55,9 +52,7 @@ class PathPlanner {
     bool OrientationController(const RobotPosition & robotPos, const SerialCommunication & reportData);
 
   private:
-    unsigned long prevSerialTime;
     float pathGoal;
-    RobotPosition lastRobotPos;
     Angle turnBegin;
     Angle turnEnd;
 };

@@ -28,6 +28,9 @@ class SerialCommunication {
     float command[10];
     Vector commandPos;
     float commandPhi;
+    bool commandIsTurn;
+
+    uint32_t cmdId;
     bool finished;
 
     struct GPSReport {

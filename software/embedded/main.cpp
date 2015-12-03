@@ -29,27 +29,16 @@ void Main::loop() {
     if(reportData.gpsData.received > prevTime) {
       robotPos.pos = reportData.gpsData.pos;
       robotPos.Phi = reportData.gpsData.phi;
-      Serial.print('Updated from the GPS data');
+      Serial.print("Updated from the GPS data");
     }
+
+    handServo.setGoal(reportData.servoGoal);
 
     reportData.sendSerialData(robotPos); //report data to matlab via serial communication
     reportData.receiveSerialData();
     //pathPlanner.LabTestRun(robotPos); //plan the next path
 
     pathPlanner.turnToGo(robotPos, reportData); //turn then go straight towards next point
-
-    /*
-    if (!reportData.finished){
-    pathPlanner.desiredMVL = .2;
-    pathPlanner.desiredMVR = .2;
-    }
-
-    pathPlanner.OrientationController(robotPos, reportData);
-    if (reportData.finished){
-      pathPlanner.desiredMVL = 0.0;
-    pathPlanner.desiredMVR = 0.0;
-    }
-    */
 
     moveRobot.controlMR(pathPlanner.desiredMVR, measureRobot.mVR); // right motor PI control
     moveRobot.controlML(pathPlanner.desiredMVL, measureRobot.mVL); //left motor PI control

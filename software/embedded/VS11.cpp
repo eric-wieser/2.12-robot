@@ -3,7 +3,7 @@
 
 VS11::VS11(int pin) {
 	// configure timers and PWM here
-	Servo::attach(pin);
+	Servo::attach(pin, 700, 2200);
 }
 
 void VS11::setGoal(float goal) {
@@ -15,4 +15,5 @@ void VS11::setGoal(float goal) {
 
 	There's no mention of PWM period, but 3000us seems likely
 	*/
+	Servo::write(180 / PI * goal);
 }

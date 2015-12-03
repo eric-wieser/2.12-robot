@@ -11,16 +11,10 @@ classdef Arduino < handle
 		function obj = Arduino(comPort)
 			obj.conn = serial(comPort);
 			obj.conn.BaudRate = 115200;
-			
+
 			% set up events
-			
-			obj.timerHandle = timer(...
-				'StartDelay',0.05,...
-				'Period', 0.05,...
-				'ExecutionMode', 'fixedDelay',...
-				'TimerFcn', @obj.recv_packets);
-			start(obj.timerHandle);
-			
+
+
 			fopen(obj.conn);
 			display('Successfully connected to Arduino over Serial!');
 
@@ -31,17 +25,30 @@ classdef Arduino < handle
 			flushinput(obj.conn);
 
 			obj.incompleteLine = '';
+
+			obj.timerHandle = timer(...
+				'StartDelay',0.05,...
+				'Period', 0.05,...
+				'ExecutionMode', 'fixedDelay',...
+				'TimerFcn', @obj.recv_packets);
+			start(obj.timerHandle);
 		end
-		
+
 		function send_packet(obj, packet)
 			% send a packet to the arduino
 
 			switch packet.type
 				case 'dest'
 					fwrite(obj.conn, 'D');
+					fwrite(obj.conn, num2str(packet.cid));
+					fwrite(obj.conn, ',');
 					fwrite(obj.conn, num2str(packet.x));
 					fwrite(obj.conn, ',');
 					fwrite(obj.conn, num2str(packet.y));
+					fwrite(obj.conn, '\n');
+				case 'turn'
+					fwrite(obj.conn, 'T');
+					fwrite(obj.conn, num2str(packet.cid));
 					fwrite(obj.conn, ',');
 					fwrite(obj.conn, num2str(packet.phi));
 					fwrite(obj.conn, '\n');
@@ -68,8 +75,8 @@ classdef Arduino < handle
 				otherwise
 					MException('arduino:encode:unkn', 'Unknown packet type').throw;
 			end
-		end		
-		
+		end
+
 		function recv_packets(obj, ~, ~)
 			% recieve a packet from the arduino.
 
@@ -77,13 +84,13 @@ classdef Arduino < handle
 			if available > 0
 				% read the buffered port contents, and concatenate it with whatever was left last time
 				data = [obj.incompleteLine fread(obj.conn, available)'];
-				
+
 				% split into lines - Serial.println sends \r\n
 				parts = strsplit(data, '\r\n');
-				
+
 				% the last line is incomplete
 				obj.incompleteLine = parts{end};
-				
+
 				% process packets
 				packets = {};
 				for part = parts(1:end-1)
@@ -102,7 +109,7 @@ classdef Arduino < handle
 			delete(obj.conn);
 		end
 	end
-	
+
 	methods (Access=private)
 		function packet = decode_packet(~, serialData)
 			contents = serialData(2:end);
@@ -120,6 +127,7 @@ classdef Arduino < handle
 					packet.y = str2double(splitData(2));
 					packet.phi = str2double(splitData(3));
 					packet.status = str2double(splitData(4));
+					packet.cid = str2double(splitData(5));
 				case 'E'
 					% error packet
 					packet = struct();
