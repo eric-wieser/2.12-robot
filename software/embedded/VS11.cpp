@@ -1,19 +1,8 @@
 #include "VS11.h"
 #include "Arduino.h"
-#include "Servo.h"
 
-VS11::VS11(float orientation) {
-	#define SERVO_arm 5 
-	Servo link3;
-
-	 void setup(){
-	   pinMode(SERVO_arm, OUTPUT);
-	   link3.attach(SERVO);
-	 }
-	 void loop(){
-	   link3.write(orientation);
-	   delay(100);
-	 }
+VS11::VS11() {
+	// configure timers and PWM here
 }
 
 void VS11::setGoal(float goal) {
