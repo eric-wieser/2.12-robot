@@ -15,31 +15,29 @@ catch e
 end
 
 dynamixel_conn = DynamixelConn(7, 4);
-rail = Rail(d);
+%%rail = Rail(dynamixel_conn);
 
 nav = Navigator(arduino);
 plotter = ArenaPlotter(arduino);
 
-arm = Arm(dynamixel_conn, arduino);
+%arm = Arm(dynamixel_conn, arduino);
 
-gps = GPS('192.168.1.121');
+gps= GPS('192.168.1.121');
 
 % TODO - all the things
 
 %% Task One -- Mount Simmons
-mt_simmons_x = 0;
-mt_simmons_y = 0;
-pos = gps.read();
-ERROR = .1;
+mt_simmons_x = 1.25;
+mt_simmons_y = .5;
 
 nav.gpsFeedbackNav(gps, mt_simmons_x, mt_simmons_y);
 
-arm.sweepSnow();
-arm.outoftheway();
-rail.dumpSnow();
-rail.wiggle();
-rail.dumpDebris();
-rail.wiggle();
+% arm.sweepSnow();
+% arm.outoftheway();
+% rail.dumpSnow();
+% rail.wiggle();
+% rail.dumpDebris();
+% rail.wiggle();
 %% Task 2 -- Pick Up Tree
 tree_x = 0;
 tree_y = 0;
