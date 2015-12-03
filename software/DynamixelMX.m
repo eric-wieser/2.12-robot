@@ -94,7 +94,12 @@ classdef DynamixelMX < handle
         function res = read_byte(obj, reg)
             res = obj.conn.read_byte(obj.id, reg);
         end
-        
+
+        function errors = get_errors(obj)
+            obj.ping();
+            errors = obj.conn.get_errors();
+        end
+
         function val = get(obj, name)
             if isscalar(obj)
                 reg = DynamixelMX.registers(name);
