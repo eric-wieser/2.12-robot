@@ -68,19 +68,22 @@ classdef Rail < handle
             obj.setPoses([obj.top_height; obj.top_height - obj.max_diff]);
         end
         function wiggle(obj, n)
-           pos = obj.getPoses;
-           size = 50;
-           delay = 0.05;
-           for i=1:n
-               obj.setPoses(pos + size * [1;1]);
-               pause(delay);
-               obj.setPoses(pos + size * [1;-1]);
-               pause(delay);
-               obj.setPoses(pos + size * [-1;-1]);
-               pause(delay);
-               obj.setPoses(pos + size * [-1;1]);
-               pause(delay);
-           end
+            if ~exist('n', 'var')
+                n = 5;
+            end
+            pos = obj.getPoses;
+            size = 50;
+            delay = 0.05;
+            for i=1:n
+                obj.setPoses(pos + size * [1;1]);
+                pause(delay);
+                obj.setPoses(pos + size * [1;-1]);
+                pause(delay);
+                obj.setPoses(pos + size * [-1;-1]);
+                pause(delay);
+                obj.setPoses(pos + size * [-1;1]);
+                pause(delay);
+            end
         end
     end
 end
