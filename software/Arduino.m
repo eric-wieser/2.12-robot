@@ -96,8 +96,10 @@ classdef Arduino < handle
 				for part = parts(1:end-1)
 					part = part{1};
 					packets = [packets {obj.decode_packet(part)}];
-				end
-				obj.onPacketsParsed(packets);
+                end
+                if ~isempty(packets)
+                    obj.onPacketsParsed(packets);
+                end
 			end
 		end
 
