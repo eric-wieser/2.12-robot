@@ -45,7 +45,6 @@ classdef DynamixelConn < handle
 			if stat ~= obj.COMM_RXSUCCESS
 				error('dynamixel:io', ['Error during ping: ' DynamixelConn.comm_names{stat+1}]);
 			end
-			obj.error_check();
 		end
 
 		function res = read_word(obj, id, reg)
@@ -54,7 +53,6 @@ classdef DynamixelConn < handle
 			if stat ~= DynamixelConn.COMM_RXSUCCESS
 				error('dynamixel:io', ['Error during read_word: ' DynamixelConn.comm_names{stat+1}]);
 			end
-			obj.error_check();
 		end
 
 		function write_word(obj, id, reg, value)
@@ -63,7 +61,6 @@ classdef DynamixelConn < handle
 			if stat ~= DynamixelConn.COMM_RXSUCCESS
 				error('dynamixel:io', ['Error during write_word: ' DynamixelConn.comm_names{stat+1}]);
 			end
-			obj.error_check();
 		end
 
 		function res = read_byte(obj, id, reg)
@@ -80,7 +77,6 @@ classdef DynamixelConn < handle
 			if stat ~= DynamixelConn.COMM_RXSUCCESS
 				error('dynamixel:io', ['Error during write_byte: ' DynamixelConn.comm_names{stat+1}]);
 			end
-			obj.error_check();
 		end
 
 		function delete(obj)
@@ -94,35 +90,28 @@ classdef DynamixelConn < handle
 	end
 
 	methods(Access=private)
-		function error_check(obj)
+		function errors = get_errors(obj)
 			error_bit = @(bit) calllib('dynamixel', 'dxl_get_rxpacket_error', bit) == 1;
 
-			errors = {};
-			if error_bit(DynamixelConn.ERRBIT_VOLTAGE)
-				errors = [errors {'Input voltage'}];
-			end
-			if error_bit(DynamixelConn.ERRBIT_ANGLE)
-				errors = [errors {'Angle limit'}];
-			end
-			if error_bit(DynamixelConn.ERRBIT_OVERHEAT)
-				errors = [errors {'Overheat'}];
-			end
-			if error_bit(DynamixelConn.ERRBIT_RANGE)
-				errors = [errors {'Out of range'}];
-			end
-			if error_bit(DynamixelConn.ERRBIT_CHECKSUM)
-				errors = [errors {'Checksum'}];
-			end
-			if error_bit(DynamixelConn.ERRBIT_OVERLOAD)
-				errors = [errors {'Overload'}];
-			end
-			if error_bit(DynamixelConn.ERRBIT_INSTRUCTION)
-				errors = [errors {'Instruction code'}];
-			end
+			errors = struct(...
+				'InputVoltage',    error_bit(DynamixelConn.ERRBIT_VOLTAGE)
+				'AngleLimit',      error_bit(DynamixelConn.ERRBIT_ANGLE), ...
+				'Overheat',        error_bit(DynamixelConn.ERRBIT_OVERHEAT), ...
+				'OutOfRange',      error_bit(DynamixelConn.ERRBIT_RANGE), ...
+				'Checksum',        error_bit(DynamixelConn.ERRBIT_CHECKSUM), ...
+				'Overload',        error_bit(DynamixelConn.ERRBIT_OVERLOAD), ...
+				'InstructionCode', error_bit(DynamixelConn.ERRBIT_INSTRUCTION), ...
+			);
 
-			if ~empty(errors)
-				error(['dynamixel:fault', 'Dynamixel reported one or more errors: ' strjoin(errors, ', ')])
-			end
+			errors.Any = any([
+				errors.InputVoltage
+				errors.AngleLimit
+				errors.Overheat
+				errors.OutOfRange
+				errors.Checksum
+				errors.Overload
+				errors.InstructionCode
+			]);
 		end
 	end
 end
