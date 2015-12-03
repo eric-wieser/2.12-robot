@@ -108,43 +108,43 @@ distance_depth=reshaped_depth(col_depth,:);
 move=mean(distance_depth)
 
 %Find angle
-nb_points_2=0;
-for k = 1:length(lines)
-    xy = [lines(k).point1; lines(k).point2];
-    angle = atan2(xy(2,2)-xy(1,2),xy(2,1)-xy(1,1))*180/pi;
-    if angle < 30
-        nb_points_2 = nb_points_2 + 1;
-        points_array(1,nb_points_2)=xy(1,2);
-        points_array(2,nb_points_2)=xy(1,1);
-        nb_points_2 = nb_points_2+1;
-        points_array(1,nb_points_2)=xy(2,2);
-        points_array(2,nb_points_2)=xy(2,1);
-        for i=1:3
-            abscisse= round(xy(1,2)+0.25*i*(xy(2,2)-xy(1,2)));
-            ordonnee= round(xy(1,1)+0.25*i*(xy(2,1)-xy(1,1)));
-            nb_points_2 = nb_points_2+1;
-            points_array(1,nb_points_2)=abscisse;
-            points_array(2,nb_points_2)=ordonnee;
-        end
-    end
-end
-
-reshaped_mask_angle=reshape(points_xy,[],1);
-col_depth_angle=find(reshaped_mask_angle);
-
-reshaped_depth_angle=reshape(im_depth2(:,:,:),[],1);
-distance_depth_angle=reshaped_depth_angle(col_depth_angle,:);
-
-alpha = 57*pi/2*180;
-
-for i=1:nb_points
-    normd(i) = sqrt(points_array(1,i)*points_array(1,i)/4+(rowim/(2*tan(alpha)))*(rowim/(2*tan(alpha))));
-end
-
-for i=1:nb_points
-    points(i,1) = points_array(1,i)*distance_depth_angle(i,1)/normd(i);
-    points(i,2) = rowim*distance_depth_angle(i,1)/(2*tan(alpha)*normd(i));
-end
-
-linear_reg=fit(points(:,1),points(:,2),'linear');
-angle = linear_reg.Coefficients.Estimate(1);
+% nb_points_2=0;
+% for k = 1:length(lines)
+%     xy = [lines(k).point1; lines(k).point2];
+%     angle = atan2(xy(2,2)-xy(1,2),xy(2,1)-xy(1,1))*180/pi;
+%     if angle < 30
+%         nb_points_2 = nb_points_2 + 1;
+%         points_array(1,nb_points_2)=xy(1,2);
+%         points_array(2,nb_points_2)=xy(1,1);
+%         nb_points_2 = nb_points_2+1;
+%         points_array(1,nb_points_2)=xy(2,2);
+%         points_array(2,nb_points_2)=xy(2,1);
+%         for i=1:3
+%             abscisse= round(xy(1,2)+0.25*i*(xy(2,2)-xy(1,2)));
+%             ordonnee= round(xy(1,1)+0.25*i*(xy(2,1)-xy(1,1)));
+%             nb_points_2 = nb_points_2+1;
+%             points_array(1,nb_points_2)=abscisse;
+%             points_array(2,nb_points_2)=ordonnee;
+%         end
+%     end
+% end
+% 
+% reshaped_mask_angle=reshape(points_xy,[],1);
+% col_depth_angle=find(reshaped_mask_angle);
+% 
+% reshaped_depth_angle=reshape(im_depth2(:,:,:),[],1);
+% distance_depth_angle=reshaped_depth_angle(col_depth_angle,:);
+% 
+% alpha = 57*pi/2*180;
+% 
+% for i=1:nb_points
+%     normd(i) = sqrt(points_array(1,i)*points_array(1,i)/4+(rowim/(2*tan(alpha)))*(rowim/(2*tan(alpha))));
+% end
+% 
+% for i=1:nb_points
+%     points(i,1) = points_array(1,i)*distance_depth_angle(i,1)/normd(i);
+%     points(i,2) = rowim*distance_depth_angle(i,1)/(2*tan(alpha)*normd(i));
+% end
+% 
+% linear_reg=fit(points(:,1),points(:,2),'linear');
+% angle = linear_reg.Coefficients.Estimate(1);
