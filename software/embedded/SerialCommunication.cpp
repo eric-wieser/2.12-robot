@@ -46,7 +46,7 @@ void SerialCommunication::receiveSerialData() {
       commandIsTurn = false;
       updateStatus(false);
     }
-    if(type == 'T') {
+    else if(type == 'T') {
       commandPhi = command[0];
       commandIsTurn = true;
       updateStatus(false);
