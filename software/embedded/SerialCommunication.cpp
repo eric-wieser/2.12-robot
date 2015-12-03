@@ -52,7 +52,7 @@ void SerialCommunication::receiveSerialData() {
       commandIsReversed = false;
       updateStatus(false);
     }
-    if(type == 'R') {
+    else if(type == 'R') {
       cmdId = command[0];
       commandPos.x = command[1];
       commandPos.y = command[2];
