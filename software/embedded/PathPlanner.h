@@ -55,9 +55,7 @@ class PathPlanner {
     bool OrientationController(const RobotPosition & robotPos, const SerialCommunication & reportData);
 
   private:
-    unsigned long prevSerialTime;
     float pathGoal;
-    RobotPosition lastRobotPos;
     Angle turnBegin;
     Angle turnEnd;
 };

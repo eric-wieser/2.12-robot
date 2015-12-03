@@ -97,7 +97,6 @@ void PathPlanner::turnToGo(const RobotPosition & robotPos, SerialCommunication &
     desiredMVR = 0;
     desiredMVL = 0;
     currentTask = Task::IDLE;
-    lastRobotPos = robotPos;
     Serial.println("NEXT POINT");
     reportData.updateStatus(true);
   }
